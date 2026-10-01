@@ -1,0 +1,49 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}SAÉ 05 — Réseau Cocagne{% endblock %}
+
+{% block body %}
+
+<div class="page-container">
+    <div class="header">
+        <h1>SAÉ 05 — Réseau Cocagne</h1>
+        <p>Présentation du projet et répartition des fonctionnalités</p>
+    </div>
+
+    <div class="section">
+        <div class="section-title">Équipe</div>
+        <div class="team-box">
+            <div class="member">Frey Alyssia</div>
+            <div class="member">Elik Asya</div>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">Sujets du projet</div>
+
+        <div class="project-card">
+            <h3>
+                <span>Logistique des tournées</span>
+                <span class="tag">Sujet B</span>
+            </h3>
+            <p>Conception d'un outil permettant d'organiser des tournées en fonction du nombre de paniers à livrer, de la capacité des dépôts, ainsi que du nombre et de la capacité des camionnettes.</p>
+        </div>
+
+        <div class="project-card">
+            <h3>
+                <span>Carte de livraison</span>
+                <span class="tag">Sujet B</span>
+            </h3>
+            <p>Concevoir l'interface permettant de créer les tournées de livraison et dessiner l'itinéraire sur une carte en fonction des dépôts sélectionnés.</p>
+        </div>
+
+        <div class="project-card">
+            <h3>
+                <span>Gestion des recettes</span>
+                <span class="tag">Sujet C</span>
+            </h3>
+            <p>Concevoir une rubrique permettant de gérer des recettes de cuisine et ajouter un moteur de recherche textuel.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
