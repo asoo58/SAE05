@@ -44,6 +44,7 @@ jobs:
           touch .env
           echo "APP_ENV=test" > .env.test.local
           echo "APP_SECRET=cc98f9da94541703bf5bf4e07a3c3d5a" >> .env.test.local
+          echo "DEFAULT_URI=http://localhost" >> .env.test.local
           echo "DATABASE_URL=postgresql://symfony:symfony_password@127.0.0.1:5432/sae_test?serverVersion=16&charset=utf8" >> .env.test.local
 
       - name: Installer les dépendances
