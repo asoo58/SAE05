@@ -90,5 +90,4 @@ jobs:
       - name: Exécuter les tests
         env:
           APP_ENV: test
-          KERNEL_CLASS: 'App\Kernel'
         run: php bin/phpunit
