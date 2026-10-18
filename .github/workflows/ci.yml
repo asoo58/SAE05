@@ -1,0 +1,65 @@
+name: CI Symfony PostgreSQL
+
+on:
+  pull_request:
+    branches: [ main ]
+  push:
+    branches: [ main ]
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgis/postgis:16-3.4 # Conteneur PG 16 avec support spatial
+        env:
+          POSTGRES_DB: sae_test
+          POSTGRES_USER: symfony
+          POSTGRES_PASSWORD: symfony_password
+        ports:
+          - 5432:5432
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+
+    steps:
+      - name: Récupérer le code
+        uses: actions/checkout@v4
+
+      - name: Configurer PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: pdo, pdo_pgsql, intl, zip
+          coverage: none
+
+      - name: Mettre en cache Composer
+        uses: actions/cache@v4
+        with:
+          path: vendor
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: ${{ runner.os }}-composer-
+
+      - name: Installer les dépendances
+        run: composer install --prefer-dist --no-progress --no-interaction
+
+      - name: Préparer la base de test
+        env:
+          DATABASE_URL: "postgresql://symfony:symfony_password@127.0.0.1:5432/sae_test?serverVersion=16&charset=utf8"
+          APP_ENV: test
+        run: |
+          php bin/console cache:clear --env=test
+          php bin/console doctrine:database:drop --if-exists --force --env=test
+          php bin/console doctrine:database:create --env=test
+          php bin/console doctrine:migrations:migrate --no-interaction --env=test
+
+      - name: Contrôler la syntaxe (lint)
+        run: |
+          php bin/console lint:yaml config --parse-tags
+          php bin/console lint:twig templates
+          php bin/console lint:container
+
+      - name: Exécuter les tests
+        env:
+          DATABASE_URL: "postgresql://symfony:symfony_password@127.0.0.1:5432/sae_test?serverVersion=16&charset=utf8"
+          APP_ENV: test
+        run: php bin/phpunit
