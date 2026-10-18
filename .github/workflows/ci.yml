@@ -12,7 +12,7 @@ jobs:
 
     services:
       postgres:
-        image: postgis/postgis:16-3.4 # Conteneur PG 16 avec support spatial
+        image: postgis/postgis:16-3.4
         env:
           POSTGRES_DB: sae_test
           POSTGRES_USER: symfony
@@ -39,12 +39,20 @@ jobs:
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
           restore-keys: ${{ runner.os }}-composer-
 
+      - name: Préparer les variables d'environnement
+        run: |
+          touch .env
+          echo "APP_ENV=test" > .env.test.local
+          echo "APP_SECRET=cc98f9da94541703bf5bf4e07a3c3d5a" >> .env.test.local
+          echo "DATABASE_URL=postgresql://symfony:symfony_password@127.0.0.1:5432/sae_test?serverVersion=16&charset=utf8" >> .env.test.local
+
       - name: Installer les dépendances
+        env:
+          APP_ENV: test
         run: composer install --prefer-dist --no-progress --no-interaction
 
       - name: Préparer la base de test
         env:
-          DATABASE_URL: "postgresql://symfony:symfony_password@127.0.0.1:5432/sae_test?serverVersion=16&charset=utf8"
           APP_ENV: test
         run: |
           php bin/console cache:clear --env=test
@@ -60,6 +68,5 @@ jobs:
 
       - name: Exécuter les tests
         env:
-          DATABASE_URL: "postgresql://symfony:symfony_password@127.0.0.1:5432/sae_test?serverVersion=16&charset=utf8"
           APP_ENV: test
         run: php bin/phpunit
