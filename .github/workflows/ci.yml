@@ -10,6 +10,13 @@ jobs:
   tests:
     runs-on: ubuntu-latest
 
+    # Variables globales injectées dans toutes les étapes du job
+    env:
+      APP_ENV: test
+      APP_SECRET: cc98f9da94541703bf5bf4e07a3c3d5a
+      DEFAULT_URI: "http://localhost"
+      DATABASE_URL: "postgresql://symfony:symfony_password@127.0.0.1:5432/sae_test?serverVersion=16&charset=utf8"
+
     services:
       postgres:
         image: postgis/postgis:16-3.4
@@ -39,38 +46,32 @@ jobs:
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
           restore-keys: ${{ runner.os }}-composer-
 
-      - name: Préparer les variables d'environnement
+      - name: Créer les fichiers d'environnement
         run: |
-          touch .env
-          echo "APP_ENV=test" > .env.test.local
-          echo "APP_SECRET=cc98f9da94541703bf5bf4e07a3c3d5a" >> .env.test.local
-          echo "DEFAULT_URI=http://localhost" >> .env.test.local
-          echo "DATABASE_URL=postgresql://symfony:symfony_password@127.0.0.1:5432/sae_test?serverVersion=16&charset=utf8" >> .env.test.local
+          cat << 'EOF' > .env
+          APP_ENV=test
+          APP_SECRET=cc98f9da94541703bf5bf4e07a3c3d5a
+          DEFAULT_URI=http://localhost
+          DATABASE_URL="postgresql://symfony:symfony_password@127.0.0.1:5432/sae_test?serverVersion=16&charset=utf8"
+          EOF
+          cp .env .env.test
+          cp .env .env.local
 
       - name: Installer les dépendances
-        env:
-          APP_ENV: test
         run: composer install --prefer-dist --no-progress --no-interaction
 
-      - name: Préparer la base de test
-        env:
-          APP_ENV: test
+      - name: Préparer la base de données
         run: |
           php bin/console cache:clear --env=test
           php bin/console doctrine:database:drop --if-exists --force --env=test
           php bin/console doctrine:database:create --env=test
-          # Crée les tables directement à partir de vos entités ORM :
           php bin/console doctrine:schema:update --force --env=test
-          # Ou si vous utilisez des migrations :
-          # php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration --env=test
 
       - name: Contrôler la syntaxe (lint)
         run: |
-          php bin/console lint:yaml config --parse-tags
-          php bin/console lint:twig templates
-          php bin/console lint:container
+          php bin/console lint:yaml config --parse-tags --env=test
+          php bin/console lint:twig templates --env=test
+          php bin/console lint:container --env=test
 
       - name: Exécuter les tests
-        env:
-          APP_ENV: test
         run: php bin/phpunit
