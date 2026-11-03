@@ -1,49 +1,66 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}SAÉ 05 — Réseau Cocagne{% endblock %}
+{% block title %}Accueil - Les Jardins de Cocagne{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/accueil.css') }}">
+{% endblock %}
 
 {% block body %}
+    {# --- Bloc principal de présentation (format réduit) --- #}
+    <div class="description">
+        <div class="description-text">
+            <h1>Agriculture Bio & Solidaire au cœur des Vosges</h1>
+            <p>Depuis 1994, nous cultivons en maraîchage biologique pour proposer des paniers de légumes frais tout en favorisant l'insertion professionnelle de personnes éloignées de l'emploi.</p>
+        </div>
 
-<div class="page-container">
-    <div class="header">
-        <h1>SAÉ 05 — Réseau Cocagne</h1>
-        <p>Présentation du projet et répartition des fonctionnalités</p>
-    </div>
-
-    <div class="section">
-        <div class="section-title">Équipe</div>
-        <div class="team-box">
-            <div class="member">Frey Alyssia</div>
-            <div class="member">Elik Asya</div>
+        <div class="image-wrapper">
+            <img src="{{ asset('images/accueil.png') }}" alt="Jardins de Cocagne">
         </div>
     </div>
 
-    <div class="section">
-        <div class="section-title">Sujets du projet</div>
-
-        <div class="project-card">
-            <h3>
-                <span>Logistique des tournées</span>
-                <span class="tag">Sujet B</span>
-            </h3>
-            <p>Conception d'un outil permettant d'organiser des tournées en fonction du nombre de paniers à livrer, de la capacité des dépôts, ainsi que du nombre et de la capacité des camionnettes.</p>
+    {# --- Accès rapides aux modules clés (Sujets B & C + Contact) --- #}
+    <section class="modules-accueil">
+        {# Sujet B : Dépôts & Tournées #}
+        <div id="depots" class="carte-module">
+            <div class="image-module">
+                <img src="https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?auto=format&fit=crop&w=500&q=80" alt="Carte des dépôts">
+                <span class="pastille-module">Sujet Tournées</span>
+            </div>
+            <div class="contenu-module">
+                <h3>Points de Dépôt & Tournées</h3>
+                <p>Repérez sur la carte les lieux où récupérer vos paniers (boulangeries, entreprises, serres) et suivez nos circuits de livraison.</p>
+                <a href="#" class="btn-module">Voir la carte</a>
+            </div>
         </div>
 
-        <div class="project-card">
-            <h3>
-                <span>Carte de livraison</span>
-                <span class="tag">Sujet B</span>
-            </h3>
-            <p>Concevoir l'interface permettant de créer les tournées de livraison et dessiner l'itinéraire sur une carte en fonction des dépôts sélectionnés.</p>
+        {# Sujet C : Recettes de cuisine #}
+        <div id="recettes" class="carte-module">
+            <div class="image-module">
+                <img src="{{ asset('images/recette.png') }}" alt="Recettes de cuisine">
+                <span class="pastille-module">Idées Recettes</span>
+            </div>
+            <div class="contenu-module">
+                <h3>Recettes du Panier</h3>
+                <p>Trouvez l'inspiration grâce à notre moteur de recherche de recettes : apprenez à cuisiner les panais, blettes et courges de saison.</p>
+                <a href="#" class="btn-module">Trouver une recette</a>
+            </div>
         </div>
 
-        <div class="project-card">
-            <h3>
-                <span>Gestion des recettes</span>
-                <span class="tag">Sujet C</span>
-            </h3>
-            <p>Concevoir une rubrique permettant de gérer des recettes de cuisine et ajouter un moteur de recherche textuel.</p>
+        {# Contact direct #}
+        <div id="contact" class="carte-module">
+            <div class="image-module">
+                <img src="{{ asset('images/contact.png') }}" alt="Équipe maraîchère">
+                <a href="{{ path('app_contact') }}" class="pastille-module">Nous rencontrer</a>
+            </div>
+            <div class="contenu-module">
+                <h3>Contact & Visite</h3>
+                <p>Une question sur les adhésions ou envie de découvrir nos serres à Thaon-les-Vosges ? Échangez avec notre équipe.</p>
+                <a href="{{ path('app_contact') }}" class="btn-module">Nous contacter</a>
+            </div>
         </div>
-    </div>
-</div>
+
+
+    </section>
 {% endblock %}

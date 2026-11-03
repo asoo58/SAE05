@@ -1,0 +1,568 @@
+/* ==========================================================================
+   VARIABLES & BASE
+   ========================================================================== */
+
+:root {
+    --vert: #00664f;
+    --orange: #cc7826;
+    --violet: #4f46e5;
+    --blanc: #ffffff;
+}
+
+body.my-page {
+    margin: 0;
+    font-family: 'Sofia Pro', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.my-page::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background: url("../images/fond.png") center / cover no-repeat;
+    opacity: 0.35;
+    z-index: -1;
+    pointer-events: none;
+}
+
+.container {
+    flex: 1;
+}
+
+
+/* ==========================================================================
+   HEADER
+   ========================================================================== */
+
+header {
+    background: var(--blanc);
+    padding: 12px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 14px rgba(31, 41, 55, 0.15);
+    position: relative;
+    z-index: 10;
+}
+
+header .bas,
+header .logo,
+header .logo a {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    text-decoration: none;
+}
+
+header .logo img {
+    height: 60px;
+    width: auto;
+}
+
+header .logo-text h1 {
+    font-size: 1.35rem;
+    font-weight: 800;
+    color: var(--vert);
+    margin: 0;
+}
+
+header .logo-text p {
+    font-size: 0.85rem;
+    color: #666;
+    margin: 0;
+}
+
+header .btn {
+    background: var(--orange);
+    color: var(--blanc);
+    padding: 8px 18px;
+    border-radius: 30px;
+    border: none;
+    font-weight: 600;
+    text-decoration: none;
+    transition: 0.2s;
+}
+
+header .btn:hover {
+    background: #fcc95a;
+    color: #1b4332;
+}
+
+.nomconnex {
+    color: var(--orange);
+    font-size: 1.15rem;
+    font-weight: 700;
+    margin-right: 15px;
+}
+
+.btn-modern {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 20px;
+    background: linear-gradient(135deg, var(--violet), #4338ca);
+    color: var(--blanc);
+    font-weight: 600;
+    border-radius: 12px;
+    text-decoration: none;
+    box-shadow: 0 4px 10px rgba(79, 70, 229, 0.25);
+    transition: 0.3s;
+}
+
+.btn-modern:hover {
+    transform: translateY(-2px);
+    color: var(--blanc);
+}
+
+
+/* ==========================================================================
+   BLOC ACCUEIL (DESCRIPTION + OVERLAY)
+   ========================================================================== */
+
+.description {
+    display: flex;
+    background: var(--vert);
+    /* Dimensions réduites */
+    max-width: 80%;
+    /* Réduit la longueur / largeur (au lieu de 100%) */
+    margin: 2.5rem auto;
+    /* Centre le bloc horizontalement */
+    border-radius: 24px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.18);
+    overflow: hidden;
+}
+
+.description-text {
+    flex: 1.1;
+    padding: 2.2rem 2.5rem;
+    /* Padding diminué pour s'adapter aux dimensions */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    z-index: 2;
+}
+
+.description-text h1 {
+    font-size: 1.9rem;
+    /* Typographie légèrement réduite */
+    font-weight: 800;
+    line-height: 1.2;
+    color: var(--blanc);
+    margin-bottom: 0.8rem;
+}
+
+.description-text p {
+    font-size: 1.05rem;
+    line-height: 1.5;
+    color: #e2f0e7;
+    margin: 0;
+}
+
+.image-wrapper {
+    flex: 1.2;
+    position: relative;
+}
+
+.image-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.image-wrapper::before {
+    content: "";
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 40%;
+    background: linear-gradient(to right, var(--vert), transparent);
+}
+
+
+/* --- Navigation du Header --- */
+
+.navigation-principale {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+}
+
+.nav-lien {
+    text-decoration: none;
+    color: #2b3a32;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: color 0.2s ease;
+    padding-bottom: 4px;
+}
+
+.nav-lien:hover,
+.nav-lien.actif {
+    color: var(--vert);
+    border-bottom: 2px solid var(--vert);
+}
+
+
+/* --- Grille des modules (Sujets B, C et Contact) --- */
+
+.modules-accueil {
+    max-width: 960px;
+    margin: 0 auto 3.5rem auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 25px;
+}
+
+.carte-module {
+    background: #ffffff;
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.07);
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.carte-module:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.image-module {
+    position: relative;
+    height: 160px;
+}
+
+.image-module img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.pastille-module {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    background: rgba(0, 102, 79, 0.9);
+    color: #ffffff;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 12px;
+    text-transform: uppercase;
+}
+
+.contenu-module {
+    padding: 22px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.contenu-module h3 {
+    font-size: 1.25rem;
+    color: var(--vert);
+    margin: 0 0 10px 0;
+    font-weight: 700;
+}
+
+.contenu-module p {
+    font-size: 0.95rem;
+    color: #55665a;
+    line-height: 1.5;
+    margin: 0 0 20px 0;
+    flex-grow: 1;
+}
+
+.btn-module {
+    display: inline-block;
+    text-align: center;
+    background: #f1f6f3;
+    color: var(--vert);
+    border: 1px solid #d4e3d9;
+    padding: 10px 16px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.btn-module:hover {
+    background: var(--vert);
+    color: #ffffff;
+    border-color: var(--vert);
+}
+
+
+/* Responsive */
+
+@media (max-width: 850px) {
+    .navigation-principale {
+        display: none;
+        /* Masque la navigation sur mobile pour ne pas écraser le header */
+    }
+}
+
+
+/* ==========================================================================
+   PAGE ET FORMULAIRE DE CONTACT
+   ========================================================================== */
+
+
+/* --- Alerte de succès verte --- */
+
+
+/* ==========================================================================
+   ALERTE DE SUCCÈS (Compatible avec base.html.twig)
+   ========================================================================== */
+
+
+/* Cible l'alerte générée par base.html.twig */
+
+.alert.alert-info,
+.alert.alert-success,
+.alert-succes {
+    background-color: #d8f3dc !important;
+    border: 1px solid #74c69d !important;
+    color: #1b4332 !important;
+    padding: 14px 20px !important;
+    border-radius: 12px !important;
+    font-size: 1rem !important;
+    font-weight: 600 !important;
+    max-width: 650px;
+    margin: 20px auto !important;
+    /* Centre l'alerte horizontalement */
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+
+/* Petite coche verte devant le texte */
+
+.alert.alert-info::before,
+.alert.alert-success::before,
+.alert-succes::before {
+    content: "✓";
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: 24px;
+    height: 24px;
+    background-color: #2d6a4f;
+    color: #ffffff;
+    border-radius: 50%;
+    font-size: 0.85rem;
+    margin-right: 12px;
+    flex-shrink: 0;
+}
+
+
+/* Masquer le petit bouton de fermeture cassé */
+
+.alert .btn-close {
+    display: none !important;
+}
+
+.page-contact {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 3rem 1rem;
+}
+
+.cadre-contact {
+    background: var(--blanc, #ffffff);
+    max-width: 600px;
+    width: 100%;
+    padding: 2.5rem 3rem;
+    border-radius: 24px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+}
+
+.cadre-contact h1 {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--vert, #00664f);
+    margin: 0 0 0.5rem 0;
+}
+
+.cadre-contact .sous-titre {
+    font-size: 1rem;
+    color: #555555;
+    margin: 0 0 2rem 0;
+    line-height: 1.5;
+}
+
+
+/* Organisation des champs */
+
+.formulaire-contact {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.champ-groupe {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.champ-groupe label {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #2b3a32;
+}
+
+.champ-groupe input,
+.champ-groupe textarea {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid #dcdcdc;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    font-family: inherit;
+    box-sizing: border-box;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    background-color: #fafafa;
+}
+
+.champ-groupe input:focus,
+.champ-groupe textarea:focus {
+    outline: none;
+    background-color: #ffffff;
+    border-color: var(--vert, #00664f);
+    box-shadow: 0 0 0 3px rgba(0, 102, 79, 0.15);
+}
+
+.champ-groupe textarea {
+    resize: vertical;
+    min-height: 120px;
+}
+
+
+/* Bouton d'envoi */
+
+.formulaire-contact .btn-orange {
+    align-self: flex-start;
+    background: var(--orange, #cc7826);
+    color: var(--blanc, #ffffff);
+    padding: 12px 24px;
+    border-radius: 30px;
+    border: none;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.formulaire-contact .btn-orange:hover {
+    background: #b55d08;
+    transform: translateY(-2px);
+}
+
+
+/* Adaptation écran mobile */
+
+@media (max-width: 600px) {
+    .cadre-contact {
+        padding: 2rem 1.5rem;
+        border-radius: 16px;
+    }
+    .cadre-contact h1 {
+        font-size: 1.6rem;
+    }
+    .formulaire-contact .btn-orange {
+        width: 100%;
+        text-align: center;
+    }
+}
+
+
+/* ==========================================================================
+   FOOTER
+   ========================================================================== */
+
+footer {
+    background: rgba(0, 102, 79, 0.9);
+    color: var(--blanc);
+    padding: 2.5rem 2rem;
+    margin-top: 4rem;
+}
+
+footer .foot {
+    display: flex;
+    justify-content: space-between;
+    max-width: 1200px;
+    margin: 0 auto;
+    gap: 2rem;
+    flex-wrap: wrap;
+}
+
+footer h1 {
+    font-size: 1.15rem;
+    margin: 0 0 1rem;
+}
+
+footer .reseau-icons,
+footer .lieu,
+footer .telephone,
+footer .mail {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+footer p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #f1f8f4;
+}
+
+footer a {
+    color: inherit;
+    transition: transform 0.2s;
+}
+
+footer a:hover {
+    transform: scale(1.1);
+}
+
+
+/* ==========================================================================
+   RESPONSIVE
+   ========================================================================== */
+
+@media (max-width: 992px) {
+    .description {
+        flex-direction: column-reverse;
+        height: auto;
+        margin: 2rem 0;
+    }
+    .description-text {
+        padding: 2rem;
+        text-align: center;
+    }
+    .description-text h1 {
+        font-size: 1.85rem;
+    }
+    .image-wrapper {
+        height: 260px;
+    }
+    .image-wrapper::before {
+        inset: auto 0 0 0;
+        width: 100%;
+        height: 45%;
+        background: linear-gradient(to top, var(--vert), transparent);
+    }
+    footer .foot {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+}
