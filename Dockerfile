@@ -1,5 +1,6 @@
 FROM php:8.4-cli-alpine
 
+COPY --from=composer:latest /usr/bin/composer /usr/local/bin/composer
 RUN apk add --no-cache bash icu-dev libpq-dev git unzip \
     && docker-php-ext-install intl pdo pdo_pgsql opcache
 
