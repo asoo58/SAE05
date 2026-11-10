@@ -17,14 +17,16 @@ Application web développée sous **Symfony 7** et conteneurisée avec **Docker 
 - **Logistique des tournées (Sujet B) :** Outil de planification et d'optimisation des tournées selon les paniers à livrer, la capacité des dépôts et les camionnettes disponibles.
 - **Carte des livraisons (Sujet B) :** Visualisation cartographique interactive et tracé dynamique des itinéraires de livraison en fonction des points de collecte sélectionnés.
 - **Gestion des recettes (Sujet C) :** Module d'administration et de consultation de fiches recettes culinaires avec moteur de recherche textuel.
+- **API REST Sécurisée :** Interface de programmation (CRUD) protégée par authentification JWT (JSON Web Token) et documentée dynamiquement via Swagger/OpenAPI.
 
 ---
 
 ## Stack technique
 
 - **Langage / Framework :** PHP 8.4, Symfony 7, Twig
+- **Sécurité & API :** LexikJWTAuthenticationBundle, NelmioApiDocBundle (Swagger)
 - **Base de données :** PostgreSQL 16
-- **Administration BDD :** pgAdmin 4 / Adminer
+- **Administration BDD :** pgAdmin 4 / Adminer (avec persistance des données)
 - **Conteneurisation :** Docker & Docker Compose
 
 ---
@@ -44,7 +46,8 @@ Application web développée sous **Symfony 7** et conteneurisée avec **Docker 
 git clone https://github.com/asoo58/SAE05.git
 cd SAE05
 ```
-### 3. Démarré le container
+
+### 3. Démarrer les conteneurs
 
 ```bash
 docker compose up -d
@@ -59,8 +62,11 @@ docker compose exec php php bin/console doctrine:database:create --if-not-exists
 # Appliquer les migrations de schéma
 docker compose exec php php bin/console doctrine:migrations:migrate --no-interaction
 ```
-### Accès aux services
 
-- Application web : http://localhost:8090
-- Gestion BDD (Adminer / pgAdmin) : http://localhost:8091
-- ( voir les identifiants dans le .env)
+---
+
+## Accès aux services
+
+- **Application web :** http://localhost:8090
+- **Documentation API (Swagger) :** http://localhost:8090/api/doc
+- **Gestion BDD (Adminer / pgAdmin) :** http://localhost:8091 ou http://localhost:5050 *(voir ports exacts et identifiants dans le `.env`)*

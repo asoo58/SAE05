@@ -22,5 +22,6 @@
 /assets/vendor/
 ###< symfony/asset-mapper ###
 
-# Lexik JWT keys
+###> lexik/jwt-authentication-bundle ###
 /config/jwt/*.pem
+###< lexik/jwt-authentication-bundle ###
