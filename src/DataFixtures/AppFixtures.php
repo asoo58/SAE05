@@ -20,6 +20,10 @@ class AppFixtures extends Fixture
     {
         $user = new Utilisateur();
         $user->setEmail('prof@cocagne.fr');
+        $user->setNom('Prof');
+        $user->setPrenom('Cocagne');
+        $user->setTelephone('0600000000');
+        $user->setActif(true);
         $user->setRoles(['ROLE_ADMIN']);
         
         // Hachage sécurisé du mot de passe "test"
