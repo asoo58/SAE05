@@ -34,6 +34,7 @@ services:
   db_admin:
     image: dpage/pgadmin4:latest
     container_name: '${APP_NAME}-db-admin'
+    user: root 
     restart: unless-stopped
     ports:
       - '${APP_DB_ADMIN_PORT}:80'
