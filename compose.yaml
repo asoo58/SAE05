@@ -40,6 +40,8 @@ services:
     environment:
       PGADMIN_DEFAULT_EMAIL: ${POSTGRES_EMAIL}
       PGADMIN_DEFAULT_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
     depends_on:
       database:
         condition: service_healthy
@@ -48,3 +50,4 @@ services:
 
 volumes:
   database_data:
+  pgadmin_data:
