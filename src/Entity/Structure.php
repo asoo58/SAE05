@@ -55,7 +55,7 @@ class Structure
     private ?string $point_depart_lng = null;
 
     #[ORM\Column(options: ['default' => false])]
-    private ?bool $assujettiTva = false;
+    private ?bool $assujetti_tva = false;
 
     /**
      * @var Collection<int, Depot>

@@ -23,7 +23,7 @@ class Abonnement
     private ?\DateTime $date_fin = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 5, scale: 2, options: ['default' => '0'])]
-    private ?string $remisePourcentage = '0';
+    private ?string $remise_pourcentage = '0';
 
     #[ORM\Column(length: 20, options: ['default' => 'actif'])]
     private ?string $statut = 'actif';

@@ -31,7 +31,7 @@ class Produit
     private ?string $marge = null;
 
     #[ORM\Column(options: ['default' => 1])]
-    private ?int $encombrementCagettes = 1;
+    private ?int $encombrement_cagettes = 1;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $photo_url = null;
