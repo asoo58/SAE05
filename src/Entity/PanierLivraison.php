@@ -20,6 +20,23 @@ class PanierLivraison
     #[ORM\Column(nullable: true)]
     private ?\DateTime $date_statut_livre = null;
 
+    #[ORM\ManyToOne]
+    private ?LivraisonTournee $livraisonTournee = null;
+
+    #[ORM\ManyToOne]
+    private ?Abonnement $abonnement = null;
+
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(name: 'depot_id', referencedColumnName: 'id_depot')]
+    private ?Depot $depot = null;
+
+    public function getLivraisonTournee(): ?LivraisonTournee { return $this->livraisonTournee; }
+    public function setLivraisonTournee(?LivraisonTournee $livraisonTournee): static { $this->livraisonTournee = $livraisonTournee; return $this; }
+    public function getAbonnement(): ?Abonnement { return $this->abonnement; }
+    public function setAbonnement(?Abonnement $abonnement): static { $this->abonnement = $abonnement; return $this; }
+    public function getDepot(): ?Depot { return $this->depot; }
+    public function setDepot(?Depot $depot): static { $this->depot = $depot; return $this; }
+
     public function getId(): ?int
     {
         return $this->id;

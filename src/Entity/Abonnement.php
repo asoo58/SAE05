@@ -35,16 +35,20 @@ class Abonnement
     private Collection $reglements;
 
     #[ORM\ManyToOne(inversedBy: 'abonnements')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: false, referencedColumnName: 'id_adherent')]
     private ?Adherent $adherent = null;
 
     #[ORM\ManyToOne(inversedBy: 'abonnements')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: false, referencedColumnName: 'id_produit')]
     private ?Produit $produit = null;
 
     #[ORM\ManyToOne(inversedBy: 'abonnements')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Calendrier $calendrier = null;
+
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(name: 'id_depot', referencedColumnName: 'id_depot', nullable: true)]
+    private ?Depot $depot = null;
 
     public function __construct()
     {
@@ -169,4 +173,7 @@ class Abonnement
 
         return $this;
     }
+
+    public function getDepot(): ?Depot { return $this->depot; }
+    public function setDepot(?Depot $depot): static { $this->depot = $depot; return $this; }
 }

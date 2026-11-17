@@ -29,6 +29,23 @@ class LivraisonTournee
     #[ORM\Column(nullable: true)]
     private ?int $duree_minutes = null;
 
+    #[ORM\ManyToOne]
+    private ?Tournee $tournee = null;
+
+    #[ORM\ManyToOne]
+    private ?Vehicule $vehicule = null;
+
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false, referencedColumnName: 'id_chauffeur')]
+    private ?Chauffeur $chauffeur = null;
+
+    public function getTournee(): ?Tournee { return $this->tournee; }
+    public function setTournee(?Tournee $tournee): static { $this->tournee = $tournee; return $this; }
+    public function getVehicule(): ?Vehicule { return $this->vehicule; }
+    public function setVehicule(?Vehicule $vehicule): static { $this->vehicule = $vehicule; return $this; }
+    public function getChauffeur(): ?Chauffeur { return $this->chauffeur; }
+    public function setChauffeur(?Chauffeur $chauffeur): static { $this->chauffeur = $chauffeur; return $this; }
+
     public function getId(): ?int
     {
         return $this->id;

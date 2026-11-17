@@ -10,8 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
 class Chauffeur
 {
     #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
+    #[ORM\Column(name: 'id_chauffeur')]
     private ?int $id = null;
 
     #[ORM\Column(length: 30, nullable: true)]

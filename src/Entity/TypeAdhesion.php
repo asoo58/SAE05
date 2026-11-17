@@ -20,6 +20,13 @@ class TypeAdhesion
     #[ORM\Column(type: Types::DECIMAL, precision: 6, scale: 2)]
     private ?string $montant = null;
 
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(name: 'id_structure', nullable: false)]
+    private ?Structure $structure = null;
+
+    public function getStructure(): ?Structure { return $this->structure; }
+    public function setStructure(?Structure $structure): static { $this->structure = $structure; return $this; }
+
     public function getId(): ?int
     {
         return $this->id;

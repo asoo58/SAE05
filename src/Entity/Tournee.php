@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: TourneeRepository::class)]
+#[ORM\UniqueConstraint(name: 'uniq_tournee_structure_code', columns: ['id_structure', 'code_tournee'])]
 class Tournee
 {
     #[ORM\Id]
@@ -30,12 +31,9 @@ class Tournee
     #[ORM\Column(length: 7, options: ['default' => '#2E7D32'])]
     private ?string $couleur = '#2E7D32';
 
-    #[ORM\ManyToOne(inversedBy: 'tournees')]
-    private ?Vehicule $vehicule = null;
-
-    #[ORM\ManyToOne(inversedBy: 'tournees')]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?Saison $saison = null;
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(name: 'id_structure', nullable: false)]
+    private ?Structure $structure = null;
 
     /**
      * @var Collection<int, EtapeTournee>
@@ -113,29 +111,8 @@ class Tournee
         return $this;
     }
 
-    public function getVehicule(): ?Vehicule
-    {
-        return $this->vehicule;
-    }
-
-    public function setVehicule(?Vehicule $vehicule): static
-    {
-        $this->vehicule = $vehicule;
-
-        return $this;
-    }
-
-    public function getSaison(): ?Saison
-    {
-        return $this->saison;
-    }
-
-    public function setSaison(?Saison $saison): static
-    {
-        $this->saison = $saison;
-
-        return $this;
-    }
+    public function getStructure(): ?Structure { return $this->structure; }
+    public function setStructure(?Structure $structure): static { $this->structure = $structure; return $this; }
 
     /**
      * @return Collection<int, EtapeTournee>
