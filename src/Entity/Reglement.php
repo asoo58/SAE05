@@ -31,11 +31,14 @@ class Reglement
     private ?string $statut = 'en_attente';
 
     #[ORM\ManyToOne(inversedBy: 'reglements')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: false, referencedColumnName: 'id_adherent')]
     private ?Adherent $adherent = null;
 
     #[ORM\ManyToOne(inversedBy: 'reglements')]
     private ?Abonnement $abonnement = null;
+
+    #[ORM\ManyToOne]
+    private ?Adhesion $adhesion = null;
 
     public function getId(): ?int
     {
@@ -113,4 +116,7 @@ class Reglement
 
         return $this;
     }
+
+    public function getAdhesion(): ?Adhesion { return $this->adhesion; }
+    public function setAdhesion(?Adhesion $adhesion): static { $this->adhesion = $adhesion; return $this; }
 }

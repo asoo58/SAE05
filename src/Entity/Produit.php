@@ -15,7 +15,7 @@ class Produit
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column]
+    #[ORM\Column(name: 'id_produit')]
     private ?int $id = null;
 
     #[ORM\Column(length: 120)]

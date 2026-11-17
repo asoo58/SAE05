@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\IngredientRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: IngredientRepository::class)]
@@ -18,6 +20,13 @@ class Ingredient
 
     #[ORM\Column(length: 50, nullable: true)]
     private ?string $rayon = null;
+
+    /** @var Collection<int, RecetteIngredient> */
+    #[ORM\OneToMany(targetEntity: RecetteIngredient::class, mappedBy: 'ingredient')]
+    private Collection $recettes;
+
+    public function __construct() { $this->recettes = new ArrayCollection(); }
+    public function getRecettes(): Collection { return $this->recettes; }
 
     public function getId(): ?int
     {

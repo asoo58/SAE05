@@ -26,8 +26,12 @@ class CalendrierJour
     #[ORM\Column (options: ['default' => false])]
     private ?bool $est_decale;
 
-    #[ORM\Column(length: 255)]
-    private ?string $motif_decalage;
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $motif_decalage = null;
+
+    #[ORM\ManyToOne(inversedBy: 'jours')]
+    #[ORM\JoinColumn(name: 'id_calendrier', referencedColumnName: 'id', nullable: true, onDelete: 'CASCADE')]
+    private ?Calendrier $calendrier = null;
 
     public function getId(): ?int
     {
@@ -93,4 +97,7 @@ class CalendrierJour
 
         return $this;
     }
+
+    public function getCalendrier(): ?Calendrier { return $this->calendrier; }
+    public function setCalendrier(?Calendrier $calendrier): static { $this->calendrier = $calendrier; return $this; }
 }

@@ -21,7 +21,7 @@ class Structure
     #[ORM\Column(length: 150)]
     private ?string $nom_commercial = null;
 
-    #[ORM\Column(length: 150)]
+    #[ORM\Column(name: 'raison_sociale', length: 150)]
     private ?string $raison_social = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -30,28 +30,31 @@ class Structure
     #[ORM\Column(length: 255)]
     private ?string $siege_social_adresse = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $adresse_gestion = null;
 
-    #[ORM\Column(length: 20)]
+    #[ORM\Column(length: 20, nullable: true)]
     private ?string $telephone = null;
 
-    #[ORM\Column(length: 150)]
+    #[ORM\Column(length: 150, nullable: true)]
     private ?string $email = null;
 
-    #[ORM\Column(length: 14, nullable: true)]
+    #[ORM\Column(length: 14, nullable: true, unique: true)]
     private ?string $siret = null;
 
     #[ORM\Column(length: 11, nullable: true)]
     private ?string $bic = null;
 
+    #[ORM\Column(length: 34, nullable: true)]
+    private ?string $iban = null;
+
     #[ORM\Column(length: 35, nullable: true)]
     private ?string $ics = null;
 
-    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 7)]
+    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 7, nullable: true)]
     private ?string $point_depart_lat = null;
 
-    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 7)]
+    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 7, nullable: true)]
     private ?string $point_depart_lng = null;
 
     #[ORM\Column(options: ['default' => false])]
@@ -63,9 +66,19 @@ class Structure
     #[ORM\OneToMany(targetEntity: Depot::class, mappedBy: 'structure')]
     private Collection $depots;
 
+    /** @var Collection<int, Utilisateur> */
+    #[ORM\OneToMany(targetEntity: Utilisateur::class, mappedBy: 'structure')]
+    private Collection $utilisateurs;
+
+    /** @var Collection<int, Vehicule> */
+    #[ORM\OneToMany(targetEntity: Vehicule::class, mappedBy: 'structure')]
+    private Collection $vehicules;
+
     public function __construct()
     {
         $this->depots = new ArrayCollection();
+        $this->utilisateurs = new ArrayCollection();
+        $this->vehicules = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -126,7 +139,7 @@ class Structure
         return $this->adresse_gestion;
     }
 
-    public function setAdresseGestion(string $adresse_gestion): static
+    public function setAdresseGestion(?string $adresse_gestion): static
     {
         $this->adresse_gestion = $adresse_gestion;
 
@@ -138,7 +151,7 @@ class Structure
         return $this->telephone;
     }
 
-    public function setTelephone(string $telephone): static
+    public function setTelephone(?string $telephone): static
     {
         $this->telephone = $telephone;
 
@@ -150,7 +163,7 @@ class Structure
         return $this->email;
     }
 
-    public function setEmail(string $email): static
+    public function setEmail(?string $email): static
     {
         $this->email = $email;
 
@@ -198,7 +211,7 @@ class Structure
         return $this->point_depart_lat;
     }
 
-    public function setPointDepartLat(string $point_depart_lat): static
+    public function setPointDepartLat(?string $point_depart_lat): static
     {
         $this->point_depart_lat = $point_depart_lat;
 
@@ -210,7 +223,7 @@ class Structure
         return $this->point_depart_lng;
     }
 
-    public function setPointDepartLng(string $point_depart_lng): static
+    public function setPointDepartLng(?string $point_depart_lng): static
     {
         $this->point_depart_lng = $point_depart_lng;
 
@@ -258,4 +271,8 @@ class Structure
 
         return $this;
     }
+
+    public function getIban(): ?string { return $this->iban; }
+    public function setIban(?string $iban): static { $this->iban = $iban; return $this; }
+    public function getVehicules(): Collection { return $this->vehicules; }
 }

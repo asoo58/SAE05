@@ -12,14 +12,14 @@ use Doctrine\ORM\Mapping as ORM;
 class Adherent
 {
     #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
-    private ?int $id = null;
+    #[ORM\OneToOne]
+    #[ORM\JoinColumn(name: 'id_adherent', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')]
+    private ?Utilisateur $utilisateur = null;
 
-    #[ORM\Column(length: 10)]
+    #[ORM\Column(length: 10, nullable: true)]
     private ?string $civilite = null;
 
-    #[ORM\Column(length: 150, nullable: true)]
+    #[ORM\Column(name: 'raison_sociale', length: 150, nullable: true)]
     private ?string $raison_social = null;
 
     #[ORM\Column(length: 255)]
@@ -28,7 +28,7 @@ class Adherent
     #[ORM\Column(length: 10)]
     private ?string $code_postal = null;
 
-    #[ORM\Column(length: 150)]
+    #[ORM\Column(length: 100)]
     private ?string $ville = null;
 
     #[ORM\Column(length: 20, nullable: true)]
@@ -70,6 +70,9 @@ class Adherent
     #[ORM\OneToMany(targetEntity: Abonnement::class, mappedBy: 'adherent')]
     private Collection $abonnements;
 
+    public function getUtilisateur(): ?Utilisateur { return $this->utilisateur; }
+    public function setUtilisateur(?Utilisateur $utilisateur): static { $this->utilisateur = $utilisateur; return $this; }
+
     public function __construct()
     {
         $this->reglements = new ArrayCollection();
@@ -79,7 +82,7 @@ class Adherent
 
     public function getId(): ?int
     {
-        return $this->id;
+        return $this->utilisateur?->getId();
     }
 
     public function getCivilite(): ?string
@@ -87,7 +90,7 @@ class Adherent
         return $this->civilite;
     }
 
-    public function setCivilite(string $civilite): static
+    public function setCivilite(?string $civilite): static
     {
         $this->civilite = $civilite;
 

@@ -18,8 +18,8 @@ class Vehicule
     #[ORM\Column(length: 15, unique: true)]
     private ?string $immatriculation = null;
 
-    #[ORM\Column(length: 50, nullable: true)]
-    private ?string $nom_model = null;
+    #[ORM\Column(name: 'nom_modele', length: 50, nullable: true)]
+    private ?string $nom_modele = null;
 
     #[ORM\Column]
     private ?int $capacite_panier = null;
@@ -27,16 +27,17 @@ class Vehicule
     #[ORM\Column (options: ['default' => true])]
     private ?bool $actif = true;
 
-    /**
-     * @var Collection<int, Tournee>
-     */
-    #[ORM\OneToMany(targetEntity: Tournee::class, mappedBy: 'vehicule')]
-    private Collection $tournees;
+    #[ORM\ManyToOne(inversedBy: 'vehicules')]
+    #[ORM\JoinColumn(name: 'id_structure', nullable: false)]
+    private ?Structure $structure = null;
+
 
     public function __construct()
     {
-        $this->tournees = new ArrayCollection();
     }
+
+    public function getStructure(): ?Structure { return $this->structure; }
+    public function setStructure(?Structure $structure): static { $this->structure = $structure; return $this; }
 
     public function getId(): ?int
     {
@@ -57,12 +58,12 @@ class Vehicule
 
     public function getNomModel(): ?string
     {
-        return $this->nom_model;
+        return $this->nom_modele;
     }
 
     public function setNomModel(?string $nom_model): static
     {
-        $this->nom_model = $nom_model;
+        $this->nom_modele = $nom_model;
 
         return $this;
     }
@@ -91,33 +92,4 @@ class Vehicule
         return $this;
     }
 
-    /**
-     * @return Collection<int, Tournee>
-     */
-    public function getTournees(): Collection
-    {
-        return $this->tournees;
-    }
-
-    public function addTournee(Tournee $tournee): static
-    {
-        if (!$this->tournees->contains($tournee)) {
-            $this->tournees->add($tournee);
-            $tournee->setVehicule($this);
-        }
-
-        return $this;
-    }
-
-    public function removeTournee(Tournee $tournee): static
-    {
-        if ($this->tournees->removeElement($tournee)) {
-            // set the owning side to null (unless already changed)
-            if ($tournee->getVehicule() === $this) {
-                $tournee->setVehicule(null);
-            }
-        }
-
-        return $this;
-    }
 }
