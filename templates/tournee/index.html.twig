@@ -1,0 +1,71 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Carte de Livraison{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <!-- CSS Leaflet & Routing -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css" />
+{% endblock %}{% block body %}
+<!-- Ajout d'un padding (p-4) sur le container global pour décoller le tout des bords de l'écran -->
+<div class="container-fluid p-4">
+    
+    <!-- Utilisation de g-4 (gutter) pour créer un espace propre ENTRE les deux colonnes -->
+    <div class="row g-4 align-items-stretch">
+        
+        <!-- Zone Gauche -->
+        <div class="col-md-4 col-lg-3 d-none d-md-block">
+            <!-- On met le style (ombre, bord, hauteur) sur une div interne pour l'aligner avec la carte -->
+            <div class="bg-light rounded-4 shadow p-3" style="height: 60vh; overflow-y: auto;">
+                <em class="text-muted">En attente du module d'organisation des tournées...</em>
+            </div>
+        </div>
+
+        <!-- Zone Droite : La Carte Interactive -->
+        <div class="col-12 col-md-8 col-lg-9"> 
+            <!-- La carte a exactement les mêmes attributs de taille et d'ombre -->
+            <div id="map" class="rounded-4 shadow" style="height: 60vh; width: 100%; background-color: #e5e5e5; overflow: hidden;"></div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <!-- JS Leaflet & Routing -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
+    
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // 1. Initialiser la carte centrée sur le secteur des Vosges
+            const map = L.map('map').setView([48.33, 6.75], 11);
+
+            // 2. Fond de carte par défaut OpenStreetMap (Gratuit et sans API Key)
+            L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', 
+            {maxZoom: 19, attribution: '© OpenStreetMap contributors'
+            }).addTo(map);
+
+            // 3. itinéraire d'exemple 
+            L.Routing.control({
+                waypoints: [
+                    L.latLng(48.2520, 6.4468), // Exemple: Jardin de Thaon
+                    L.latLng(48.3444, 6.6433), // Exemple: Mairie
+                    L.latLng(48.2917, 6.9461)  // Exemple: Saint-Dié
+                ],
+                routeWhileDragging: false,
+                addWaypoints: false, // Empêche l'ajout de points par clic pour garder l'interface propre
+                show: false, // Masque le panneau textuel des instructions de direction
+                lineOptions: {
+                    styles: [{
+                        color: '#4f855d', // Le vert foncé utilisé sur ta maquette
+                        opacity: 0.9, 
+                        weight: 5
+                    }]
+                }
+            }).addTo(map);
+        });
+    </script>
+{% endblock %}
