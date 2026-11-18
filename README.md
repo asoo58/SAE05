@@ -70,3 +70,15 @@ docker compose exec php php bin/console doctrine:migrations:migrate --no-interac
 - **Application web :** http://localhost:8090
 - **Documentation API (Swagger) :** http://localhost:8090/api/doc
 - **Gestion BDD (Adminer / pgAdmin) :** http://localhost:8091 ou http://localhost:5050 *(voir ports exacts et identifiants dans le `.env`)*
+
+
+## API 
+Dans un premier temps il faut crée le tocken via l'authentification, pour pouvoir par la suite avoir accées a tout les autres routes/commandes  
+- **Documentation API (Swagger) :** http://localhost:8090/api/doc
+- **Accés génération token** : http://localhost:8090/api/login_check 
+    ``` json : 
+    {
+        "username": "prof@cocagne.fr",
+        "password": "test"
+    }
+
