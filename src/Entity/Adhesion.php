@@ -26,8 +26,14 @@ class Adhesion
     
     #[Groups (['api_read'])]
     #[ORM\ManyToOne(inversedBy: 'adhesions')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: false, referencedColumnName: 'id_adherent')]
     private ?Adherent $adherent = null;
+
+    #[ORM\ManyToOne]
+    private ?TypeAdhesion $typeAdhesion = null;
+
+    #[ORM\ManyToOne]
+    private ?Saison $saison = null;
 
     public function getId(): ?int
     {
@@ -69,4 +75,9 @@ class Adhesion
 
         return $this;
     }
+
+    public function getTypeAdhesion(): ?TypeAdhesion { return $this->typeAdhesion; }
+    public function setTypeAdhesion(?TypeAdhesion $typeAdhesion): static { $this->typeAdhesion = $typeAdhesion; return $this; }
+    public function getSaison(): ?Saison { return $this->saison; }
+    public function setSaison(?Saison $saison): static { $this->saison = $saison; return $this; }
 }

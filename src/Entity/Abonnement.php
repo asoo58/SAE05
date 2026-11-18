@@ -28,7 +28,7 @@ class Abonnement
 
     #[Groups(['api_read'])]
     #[ORM\Column(type: Types::DECIMAL, precision: 5, scale: 2, options: ['default' => '0'])]
-    private ?string $remisePourcentage = '0';
+    private ?string $remise_pourcentage = '0';
 
     #[Groups(['api_read'])]
     #[ORM\Column(length: 20, options: ['default' => 'actif'])]
@@ -42,18 +42,22 @@ class Abonnement
 
     #[Groups(['api_read'])]
     #[ORM\ManyToOne(inversedBy: 'abonnements')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: false, referencedColumnName: 'id_adherent')]
     private ?Adherent $adherent = null;
 
     #[Groups(['api_read'])]
     #[ORM\ManyToOne(inversedBy: 'abonnements')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: false, referencedColumnName: 'id_produit')]
     private ?Produit $produit = null;
 
     #[Groups(['api_read'])]
     #[ORM\ManyToOne(inversedBy: 'abonnements')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Calendrier $calendrier = null;
+
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(name: 'id_depot', referencedColumnName: 'id_depot', nullable: true)]
+    private ?Depot $depot = null;
 
     public function __construct()
     {
@@ -168,4 +172,7 @@ class Abonnement
         $this->calendrier = $calendrier;
         return $this;
     }
+
+    public function getDepot(): ?Depot { return $this->depot; }
+    public function setDepot(?Depot $depot): static { $this->depot = $depot; return $this; }
 }

@@ -27,15 +27,12 @@ class Saison
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     private ?\DateTime $date_fin = null;
 
-    /**
-     * @var Collection<int, Tournee>
-     */
-    #[ORM\OneToMany(targetEntity: Tournee::class, mappedBy: 'saison')]
-    private Collection $tournees;
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(name: 'id_structure', nullable: false)]
+    private ?Structure $structure = null;
 
     public function __construct()
     {
-        $this->tournees = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -79,33 +76,6 @@ class Saison
         return $this;
     }
 
-    /**
-     * @return Collection<int, Tournee>
-     */
-    public function getTournees(): Collection
-    {
-        return $this->tournees;
-    }
-
-    public function addTournee(Tournee $tournee): static
-    {
-        if (!$this->tournees->contains($tournee)) {
-            $this->tournees->add($tournee);
-            $tournee->setSaison($this);
-        }
-
-        return $this;
-    }
-
-    public function removeTournee(Tournee $tournee): static
-    {
-        if ($this->tournees->removeElement($tournee)) {
-            // set the owning side to null (unless already changed)
-            if ($tournee->getSaison() === $this) {
-                $tournee->setSaison(null);
-            }
-        }
-
-        return $this;
-    }
+    public function getStructure(): ?Structure { return $this->structure; }
+    public function setStructure(?Structure $structure): static { $this->structure = $structure; return $this; }
 }

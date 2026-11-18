@@ -17,7 +17,7 @@ class Produit
     #[Groups(['api_read'])]
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column]
+    #[ORM\Column(name: 'id_produit')]
     private ?int $id = null;
 
     #[ORM\Column(length: 120)]
@@ -33,7 +33,7 @@ class Produit
     private ?string $marge = null;
 
     #[ORM\Column(options: ['default' => 1])]
-    private ?int $encombrementCagettes = 1;
+    private ?int $encombrement_cagettes = 1;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $photo_url = null;

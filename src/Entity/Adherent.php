@@ -14,9 +14,9 @@ class Adherent
 {   
     #[Groups(['api_read'])]
     #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
-    private ?int $id = null;
+    #[ORM\OneToOne]
+    #[ORM\JoinColumn(name: 'id_adherent', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')]
+    private ?Utilisateur $utilisateur = null;
 
     #[Groups(['api_read'])]
     #[ORM\Column(length: 10)]
@@ -93,7 +93,7 @@ class Adherent
 
     public function getId(): ?int
     {
-        return $this->id;
+        return $this->utilisateur?->getId();
     }
 
     public function getCivilite(): ?string
@@ -101,7 +101,7 @@ class Adherent
         return $this->civilite;
     }
 
-    public function setCivilite(string $civilite): static
+    public function setCivilite(?string $civilite): static
     {
         $this->civilite = $civilite;
 

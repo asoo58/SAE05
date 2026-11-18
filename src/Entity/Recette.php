@@ -3,10 +3,14 @@
 namespace App\Entity;
 
 use App\Repository\RecetteRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: RecetteRepository::class)]
+#[ORM\Index(name: 'idx_recette_tsv', columns: ['tsv_recherche'])]
+#[ORM\Index(name: 'idx_recette_embedding', columns: ['embedding'])]
 class Recette
 {
     #[ORM\Id]
@@ -29,18 +33,31 @@ class Recette
     #[ORM\Column(nullable: true)]
     private ?int $temps_cuisson_min = null;
 
-    #[ORM\Column]
-    private ?int $nb_personnes = null;
+    #[ORM\Column(options: ['default' => 4])]
+    private int $nb_personnes = 4;
 
-    #[ORM\Column]
-    private ?bool $partage_national = null;
+    #[ORM\Column(options: ['default' => true])]
+    private bool $partage_national = true;
 // tsv_recherche : TSVECTOR
-    #[ORM\Column(columnDefinition: 'TSVECTOR', nullable: true)]
+    #[ORM\Column(type: 'tsvector', nullable: true)]
     private ?string $tsvRecherche = null;
 
     // embedding : VECTOR(768)
-    #[ORM\Column(columnDefinition: 'VECTOR(768)', nullable: true)]
+    #[ORM\Column(type: 'vector', nullable: true)]
     private ?string $embedding = null;
+
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(name: 'id_structure_origine', nullable: true, onDelete: 'SET NULL')]
+    private ?Structure $structureOrigine = null;
+
+    /** @var Collection<int, RecetteIngredient> */
+    #[ORM\OneToMany(targetEntity: RecetteIngredient::class, mappedBy: 'recette', cascade: ['persist'], orphanRemoval: true)]
+    private Collection $ingredients;
+
+    public function __construct() { $this->ingredients = new ArrayCollection(); }
+    public function getStructureOrigine(): ?Structure { return $this->structureOrigine; }
+    public function setStructureOrigine(?Structure $structure): static { $this->structureOrigine = $structure; return $this; }
+    public function getIngredients(): Collection { return $this->ingredients; }
 
     public function getId(): ?int
     {

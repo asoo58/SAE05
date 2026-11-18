@@ -15,7 +15,7 @@ class Depot
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column]
+    #[ORM\Column(name: 'id_depot')]
     private ?int $id = null;
 
     #[ORM\Column(length: 120)]
@@ -42,16 +42,16 @@ class Depot
     #[ORM\Column(length: 10)]
     private ?string $code_postal = null;
 
-    #[ORM\Column(length: 150)]
+    #[ORM\Column(length: 100)]
     private ?string $ville = null;
 
     #[ORM\Column]
     private ?int $capacite_max_paniers = null;
 
-    #[ORM\Column(length: 100)]
+    #[ORM\Column(length: 100, nullable: true)]
     private ?string $referent_nom = null;
 
-    #[ORM\Column(length: 20)]
+    #[ORM\Column(length: 20, nullable: true)]
     private ?string $referent_tel = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -214,7 +214,7 @@ class Depot
         return $this->referent_tel;
     }
 
-    public function setReferentTel(string $referent_tel): static
+    public function setReferentTel(?string $referent_tel): static
     {
         $this->referent_tel = $referent_tel;
 

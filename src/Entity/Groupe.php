@@ -6,6 +6,8 @@ use App\Repository\GroupeRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\UX\Turbo\Attribute\Broadcast;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 
 #[ORM\Entity(repositoryClass: GroupeRepository::class)]
 class Groupe
@@ -15,7 +17,7 @@ class Groupe
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 50)]
+    #[ORM\Column(length: 50, unique: true)]
     private ?string $code_groupe = null;
 
     #[ORM\Column(length: 100, nullable: true)]
@@ -23,6 +25,13 @@ class Groupe
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $description = null;
+
+    /** @var Collection<int, UtilisateurGroupe> */
+    #[ORM\OneToMany(targetEntity: UtilisateurGroupe::class, mappedBy: 'groupe', cascade: ['persist'], orphanRemoval: true)]
+    private Collection $utilisateurs;
+
+    public function __construct() { $this->utilisateurs = new ArrayCollection(); }
+    public function getUtilisateurs(): Collection { return $this->utilisateurs; }
 
     public function getId(): ?int
     {

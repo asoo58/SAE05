@@ -8,6 +8,8 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Attribute\Groups;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 
 
 #[ORM\Entity(repositoryClass: UtilisateurRepository::class)]
@@ -43,14 +45,32 @@ use Symfony\Component\Serializer\Attribute\Groups;
     #[ORM\Column(length: 100)]
     private ?string $prenom = null;
 
-    #[ORM\Column(length: 20)]
+    #[ORM\Column(length: 20, nullable: true)]
     private ?string $telephone = null;
 
     #[ORM\Column(options: ['default' => true])]
     private ?bool $actif = null;
 
-    #[ORM\Column(type: Types::DATE_IMMUTABLE, nullable: true)]
-    private ?\DateTimeImmutable $date_creation = null;
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, options: ['default' => 'CURRENT_TIMESTAMP'])]
+    private \DateTimeImmutable $date_creation;
+
+    #[ORM\ManyToOne(inversedBy: 'utilisateurs')]
+    #[ORM\JoinColumn(name: 'id_structure', nullable: false)]
+    private ?Structure $structure = null;
+
+    /** @var Collection<int, UtilisateurGroupe> */
+    #[ORM\OneToMany(targetEntity: UtilisateurGroupe::class, mappedBy: 'utilisateur', cascade: ['persist'], orphanRemoval: true)]
+    private Collection $groupes;
+
+    public function __construct()
+    {
+        $this->groupes = new ArrayCollection();
+        $this->date_creation = new \DateTimeImmutable();
+    }
+
+    public function getStructure(): ?Structure { return $this->structure; }
+    public function setStructure(?Structure $structure): static { $this->structure = $structure; return $this; }
+    public function getGroupes(): Collection { return $this->groupes; }
     public function getId(): ?int
     {
         return $this->id;
@@ -155,7 +175,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
         return $this->telephone;
     }
 
-    public function setTelephone(string $telephone): static
+    public function setTelephone(?string $telephone): static
     {
         $this->telephone = $telephone;
 
@@ -174,12 +194,12 @@ use Symfony\Component\Serializer\Attribute\Groups;
         return $this;
     }
 
-    public function getDateCreation(): ?\DateTimeImmutable
+    public function getDateCreation(): \DateTimeImmutable
     {
         return $this->date_creation;
     }
 
-    public function setDateCreation(?\DateTimeImmutable $date_creation): static
+    public function setDateCreation(\DateTimeImmutable $date_creation): static
     {
         $this->date_creation = $date_creation;
 
