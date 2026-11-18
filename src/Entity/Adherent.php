@@ -18,39 +18,44 @@ class Adherent
     #[ORM\Column]
     private ?int $id = null;
 
+    #[Groups(['api_read'])]
     #[ORM\Column(length: 10)]
     private ?string $civilite = null;
-
+    #[Groups(['api_read'])]
     #[ORM\Column(length: 150, nullable: true)]
     private ?string $raison_social = null;
 
+    #[Groups(['api_read'])]
     #[ORM\Column(length: 255)]
     private ?string $adresse = null;
-
+    #[Groups(['api_read'])]
     #[ORM\Column(length: 10)]
     private ?string $code_postal = null;
-
+    #[Groups(['api_read'])]
     #[ORM\Column(length: 150)]
     private ?string $ville = null;
-
+    #[Groups(['api_read'])]
     #[ORM\Column(length: 20, nullable: true)]
     private ?string $telephone_secondaire = null;
-
+    #[Groups(['api_read'])]
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
     private ?\DateTime $date_naissance = null;
 
+    #[Groups(['api_read'])]
     #[ORM\Column(length: 100, nullable: true)]
     private ?string $profession = null;
-
-  #[ORM\Column(options: ['default' => false])]
+    #[Groups(['api_read'])]
+    #[ORM\Column(options: ['default' => false])]
     private ?bool $optinSms = false;
 
+    #[Groups(['api_read'])]
     #[ORM\Column(options: ['default' => true])]
     private ?bool $optinEmail = true;
-
+    #[Groups(['api_read'])]
     #[ORM\Column(options: ['default' => false])]
     private ?bool $estProfessionnel = false;
 
+    #[Groups(['api_read'])]
     #[ORM\Column(options: ['default' => false])]
     private ?bool $dispenseAdhesion = false;
 
@@ -71,6 +76,13 @@ class Adherent
      */
     #[ORM\OneToMany(targetEntity: Abonnement::class, mappedBy: 'adherent')]
     private Collection $abonnements;
+    #[Groups(['api_read'])]
+    #[ORM\Column(length: 100)]
+    private ?string $nom = null;
+
+    #[Groups(['api_read'])]
+    #[ORM\Column(length: 100)]
+    private ?string $prenom = null;
 
     public function __construct()
     {
@@ -314,6 +326,30 @@ class Adherent
                 $abonnement->setAdherent(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getNom(): ?string
+    {
+        return $this->nom;
+    }
+
+    public function setNom(string $nom): static
+    {
+        $this->nom = $nom;
+
+        return $this;
+    }
+
+    public function getPrenom(): ?string
+    {
+        return $this->prenom;
+    }
+
+    public function setPrenom(string $prenom): static
+    {
+        $this->prenom = $prenom;
 
         return $this;
     }

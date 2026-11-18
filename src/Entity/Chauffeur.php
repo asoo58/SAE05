@@ -5,21 +5,27 @@ namespace App\Entity;
 use App\Repository\ChauffeurRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
+
 
 #[ORM\Entity(repositoryClass: ChauffeurRepository::class)]
 class Chauffeur
 {
+    #[Groups(['api_read'])]
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
+    #[Groups(['api_read'])]
     #[ORM\Column(length: 30, nullable: true)]
     private ?string $numero_permis = null;
 
+    #[Groups(['api_read'])]
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
     private ?\DateTime $date_validite_permis = null;
 
+    #[Groups(['api_read'])]
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
     private ?\DateTime $date_fimo_fco = null;
 

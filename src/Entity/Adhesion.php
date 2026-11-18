@@ -5,21 +5,26 @@ namespace App\Entity;
 use App\Repository\AdhesionRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: AdhesionRepository::class)]
 class Adhesion
 {
+    #[Groups (['api_read'])]
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
+    #[Groups (['api_read'])]
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
     private ?\DateTime $date_reglement = null;
 
+    #[Groups (['api_read'])]
     #[ORM\Column(options: ['default' => false])]
     private ?bool $est_a_jour = false;
-
+    
+    #[Groups (['api_read'])]
     #[ORM\ManyToOne(inversedBy: 'adhesions')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Adherent $adherent = null;

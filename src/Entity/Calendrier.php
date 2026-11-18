@@ -16,10 +16,10 @@ class Calendrier
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
-
+    #[Groups(['api_read'])]
     #[ORM\Column(length: 100, nullable: true)]
     private ?string $nom = null;
-
+    #[Groups(['api_read'])]
     #[ORM\Column(length: 50)]
     private ?string $frequence = null;
 
