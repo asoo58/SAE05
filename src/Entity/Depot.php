@@ -10,7 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\UX\Turbo\Attribute\Broadcast;
 
 #[ORM\Entity(repositoryClass: DepotRepository::class)]
-#[Broadcast]
+
 class Depot
 {
     #[ORM\Id]
