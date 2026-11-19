@@ -7,38 +7,48 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: RecetteRepository::class)]
 #[ORM\Index(name: 'idx_recette_tsv', columns: ['tsv_recherche'])]
 #[ORM\Index(name: 'idx_recette_embedding', columns: ['embedding'])]
 class Recette
 {
+    #[Groups(['api_read'])]
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
+    #[Groups(['api_read'])]
     #[ORM\Column(length: 200)]
     private ?string $titre = null;
 
+    #[Groups(['api_read'])]
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $description = null;
 
+    #[Groups(['api_read'])]
     #[ORM\Column(type: Types::TEXT)]
     private ?string $instructions = null;
 
+    #[Groups(['api_read'])]
     #[ORM\Column(nullable: true)]
     private ?int $temps_preparation_min = null;
 
+    #[Groups(['api_read'])]
     #[ORM\Column(nullable: true)]
     private ?int $temps_cuisson_min = null;
 
+    #[Groups(['api_read'])]
     #[ORM\Column(options: ['default' => 4])]
     private int $nb_personnes = 4;
 
+    #[Groups(['api_read'])]
     #[ORM\Column(options: ['default' => true])]
     private bool $partage_national = true;
-// tsv_recherche : TSVECTOR
+
+    // tsv_recherche : TSVECTOR
     #[ORM\Column(type: 'tsvector', nullable: true)]
     private ?string $tsvRecherche = null;
 
@@ -46,6 +56,7 @@ class Recette
     #[ORM\Column(type: 'vector', nullable: true)]
     private ?string $embedding = null;
 
+    #[Groups(['api_read'])]
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(name: 'id_structure_origine', nullable: true, onDelete: 'SET NULL')]
     private ?Structure $structureOrigine = null;
