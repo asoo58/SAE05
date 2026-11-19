@@ -5,38 +5,47 @@ namespace App\Entity;
 use App\Repository\ReglementRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: ReglementRepository::class)]
 class Reglement
 {
+    #[Groups(['api_read'])]
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
-   // date_reglement : DATE NOT NULL
+    // date_reglement : DATE NOT NULL
+    #[Groups(['api_read'])]
     #[ORM\Column(type: Types::DATE_IMMUTABLE)]
     private ?\DateTimeImmutable $dateReglement = null;
 
     // montant : DECIMAL(8,2) NOT NULL
+    #[Groups(['api_read'])]
     #[ORM\Column(type: Types::DECIMAL, precision: 8, scale: 2)]
     private ?string $montant = null;
 
     // mode_reglement : VARCHAR(30) NOT NULL
+    #[Groups(['api_read'])]
     #[ORM\Column(length: 30)]
     private ?string $modeReglement = null;
 
     // statut : VARCHAR(30) DEFAULT 'en_attente'
+    #[Groups(['api_read'])]
     #[ORM\Column(length: 30, options: ['default' => 'en_attente'])]
     private ?string $statut = 'en_attente';
 
+    #[Groups(['api_read'])]
     #[ORM\ManyToOne(inversedBy: 'reglements')]
     #[ORM\JoinColumn(nullable: false, referencedColumnName: 'id_adherent')]
     private ?Adherent $adherent = null;
 
+    #[Groups(['api_read'])]
     #[ORM\ManyToOne(inversedBy: 'reglements')]
     private ?Abonnement $abonnement = null;
 
+    #[Groups(['api_read'])]
     #[ORM\ManyToOne]
     private ?Adhesion $adhesion = null;
 
