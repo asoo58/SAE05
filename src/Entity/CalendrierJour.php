@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\CalendrierJourRepository;
 use Doctrine\DBAL\Types\Types;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: CalendrierJourRepository::class)]
@@ -21,12 +22,15 @@ class CalendrierJour
     private ?\DateTime $date_preparation = null;
 
     #[ORM\Column (options: ['default' => true])]
+    #[Groups(['api_read'])]
     private ?bool $est_livrable;
 
     #[ORM\Column (options: ['default' => false])]
+    #[Groups(['api_read'])]
     private ?bool $est_decale;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['api_read'])]
     private ?string $motif_decalage = null;
 
     #[ORM\ManyToOne(inversedBy: 'jours')]

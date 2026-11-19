@@ -28,7 +28,7 @@ class Abonnement
 
     #[Groups(['api_read'])]
     #[ORM\Column(type: Types::DECIMAL, precision: 5, scale: 2, options: ['default' => '0'])]
-    private ?string $remise_pourcentage = '0';
+    private ?string $remisePourcentage = '0';
 
     #[Groups(['api_read'])]
     #[ORM\Column(length: 20, options: ['default' => 'actif'])]

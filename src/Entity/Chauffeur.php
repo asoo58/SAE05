@@ -13,7 +13,9 @@ class Chauffeur
 {
     #[Groups(['api_read'])]
     #[ORM\Id]
+    #[ORM\GeneratedValue] 
     #[ORM\Column(name: 'id_chauffeur')]
+
     private ?int $id = null;
 
     #[Groups(['api_read'])]

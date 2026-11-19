@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\TourneeRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: TourneeRepository::class)]
@@ -31,9 +32,17 @@ class Tournee
     #[ORM\Column(length: 7, options: ['default' => '#2E7D32'])]
     private ?string $couleur = '#2E7D32';
 
+   #[Groups(['api_read'])]
+    #[ORM\ManyToOne(targetEntity: Vehicule::class)]
+    private ?Vehicule $vehicule = null;
+
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(name: 'id_structure', nullable: false)]
     private ?Structure $structure = null;
+
+    #[Groups(['api_read'])]
+    #[ORM\ManyToOne(targetEntity: Saison::class)]
+    private ?Saison $saison = null;
 
     /**
      * @var Collection<int, EtapeTournee>
@@ -140,6 +149,30 @@ class Tournee
                 $etapeTournee->setTournee(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getVehicule(): ?Vehicule
+    {
+        return $this->vehicule;
+    }
+
+    public function setVehicule(?Vehicule $vehicule): static
+    {
+        $this->vehicule = $vehicule;
+
+        return $this;
+    }
+
+    public function getSaison(): ?Saison
+    {
+        return $this->saison;
+    }
+
+    public function setSaison(?Saison $saison): static
+    {
+        $this->saison = $saison;
 
         return $this;
     }

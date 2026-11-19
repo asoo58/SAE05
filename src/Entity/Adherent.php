@@ -108,6 +108,19 @@ class Adherent
         return $this;
     }
 
+    public function getUtilisateur(): ?Utilisateur
+    {
+        return $this->utilisateur;
+    }
+
+    public function setUtilisateur(?Utilisateur $utilisateur): static
+    {
+        $this->utilisateur = $utilisateur;
+
+        return $this;
+    }
+
+
     public function getRaisonSocial(): ?string
     {
         return $this->raison_social;
