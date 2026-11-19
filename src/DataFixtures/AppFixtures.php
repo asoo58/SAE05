@@ -6,6 +6,7 @@ use App\Entity\Abonnement;
 use App\Entity\Adherent;
 use App\Entity\Adhesion;
 use App\Entity\Calendrier;
+use App\Entity\CalendrierJour;
 use App\Entity\Chauffeur;
 use App\Entity\Depot;
 use App\Entity\Employe;
@@ -35,11 +36,19 @@ class AppFixtures extends Fixture
 
     public function load(ObjectManager $manager): void
     {
-        // ==========================================
-        // 1. ENTITÉS INDÉPENDANTES (Aucune clé étrangère)
-        // ==========================================
+        // 1. ON CRÉE LA STRUCTURE EN TOUT PREMIER
+        $structure = new Structure();
+        $structure->setNomCommercial('Jardins de Cocagne');
+        $structure->setRaisonSocial('Association Cocagne Vosges');
+        $structure->setSiegeSocialAdresse('12 Rue de la Terre');
+        $structure->setAdresseGestion('12 Rue de la Terre');
+        $structure->setTelephone('0329001122');
+        $structure->setEmail('contact@cocagne-vosges.fr');
+        $structure->setPointDepartLat('48.2833');
+        $structure->setPointDepartLng('6.9500');
+        $manager->persist($structure);
 
-        // Utilisateur (Admin)
+        // 2. CRÉATION DE L'ADMIN (avec la structure)
         $user = new Utilisateur();
         $user->setEmail('prof@cocagne.fr');
         $user->setNom('Prof');
@@ -48,10 +57,28 @@ class AppFixtures extends Fixture
         $user->setActif(true);
         $user->setRoles(['ROLE_ADMIN']);
         $user->setPassword($this->hasher->hashPassword($user, 'test'));
+        $user->setStructure($structure); // <-- AJOUT
         $manager->persist($user);
+
+        // 3. CRÉATION DU COMPTE ADHÉRENT (avec la structure)
+        $userAdherent = new Utilisateur();
+        $userAdherent->setEmail('client@cocagne.fr');
+        $userAdherent->setNom('Martin');
+        $userAdherent->setPrenom('Sophie');
+        $userAdherent->setTelephone('0611223344');
+        $userAdherent->setActif(true);
+        $userAdherent->setRoles(['ROLE_USER']);
+        $userAdherent->setPassword($this->hasher->hashPassword($userAdherent, 'test'));
+        $userAdherent->setStructure($structure); // <-- AJOUT
+        
+        $manager->persist($userAdherent);
+        $manager->flush(); // Le fameux flush intermédiaire pour l'ID
+
+            
 
         // Adhérent
         $adherent = new Adherent();
+        $adherent->setUtilisateur($userAdherent); 
         $adherent->setCivilite('Mme');
         $adherent->setNom('Martin');    
         $adherent->setPrenom('Sophie'); 
@@ -88,23 +115,23 @@ class AppFixtures extends Fixture
         $calendrierHebdo->setFrequence('hebdomadaire');
         $manager->persist($calendrierHebdo);
 
-        // Structure (L'association mère)
-        $structure = new Structure();
-        $structure->setNomCommercial('Jardins de Cocagne');
-        $structure->setRaisonSocial('Association Cocagne Vosges');
-        $structure->setSiegeSocialAdresse('12 Rue de la Terre');
-        $structure->setAdresseGestion('12 Rue de la Terre');
-        $structure->setTelephone('0329001122');
-        $structure->setEmail('contact@cocagne-vosges.fr');
-        $structure->setPointDepartLat('48.2833');
-        $structure->setPointDepartLng('6.9500');
-        $manager->persist($structure);
+
+        $calendrierJour = new CalendrierJour();
+        $calendrierJour->setDatePreparation(new \DateTime('2026-11-23'));
+        $calendrierJour->setDateLivraison(new \DateTime('2026-11-24'));
+        $calendrierJour->setEstLivrable(true);
+        $calendrierJour->setEstDecale(false);
+        $calendrierJour->setCalendrier($calendrierHebdo);
+        $manager->persist($calendrierJour);
+
+        
 
         // Saison
         $saisonEte = new Saison();
         $saisonEte->setLibelle('Saison Été 2026');
         $saisonEte->setDateDebut(new \DateTime('2026-05-01'));
         $saisonEte->setDateFin(new \DateTime('2026-10-31'));
+        $saisonEte->setStructure($structure);
         $manager->persist($saisonEte);
 
         // Véhicule
@@ -113,6 +140,7 @@ class AppFixtures extends Fixture
         $vehicule->setNomModel('Renault Kangoo ZE');
         $vehicule->setCapacitePanier(40);
         $vehicule->setActif(true);
+        $vehicule->setStructure($structure);
         $manager->persist($vehicule);
 
         // Chauffeur & Employé
@@ -120,7 +148,23 @@ class AppFixtures extends Fixture
         $chauffeur->setNumeroPermis('123456789ABC');
         $manager->persist($chauffeur);
 
+        // ---Création du compte utilisateur de l'employé ---
+        $userEmploye = new Utilisateur();
+        $userEmploye->setEmail('employe@cocagne.fr');
+        $userEmploye->setNom('Dubois');
+        $userEmploye->setPrenom('Marc');
+        $userEmploye->setTelephone('0622334455');
+        $userEmploye->setActif(true);
+        $userEmploye->setRoles(['ROLE_USER']);
+        $userEmploye->setPassword($this->hasher->hashPassword($userEmploye, 'test'));
+        $userEmploye->setStructure($structure); // On n'oublie pas la structure !
+
+        $manager->persist($userEmploye);
+        $manager->flush(); // On génère l'ID tout de suite
+
+        // Création de l'employé avec son compte lié ---
         $employe = new Employe();
+        $employe->setUtilisateur($userEmploye); // La liaison indispensable
         $employe->setPoste('Préparateur de commandes');
         $employe->setActif(true);
         $manager->persist($employe);
@@ -142,6 +186,7 @@ class AppFixtures extends Fixture
         $typeAdhesion = new TypeAdhesion();
         $typeAdhesion->setLibelle('Adhésion Standard');
         $typeAdhesion->setMontant('15.00');
+        $typeAdhesion->setStructure($structure);
         $manager->persist($typeAdhesion);
 
         $groupe = new Groupe();
@@ -188,6 +233,7 @@ class AppFixtures extends Fixture
         $manager->persist($abonnement);
 
         // Tournée (liée à Véhicule, Saison)
+        // Tournée (liée à Véhicule, Saison, Structure)
         $tournee = new Tournee();
         $tournee->setCodeTournee('T-MARDI-01');
         $tournee->setNom('Tournée Centre');
@@ -196,6 +242,7 @@ class AppFixtures extends Fixture
         $tournee->setCouleur('#2E7D32');
         $tournee->setVehicule($vehicule);
         $tournee->setSaison($saisonEte);
+        $tournee->setStructure($structure);
         $manager->persist($tournee);
 
         // Règlement (lié à Adhérent et Abonnement)
@@ -207,6 +254,7 @@ class AppFixtures extends Fixture
         $reglement->setAdherent($adherent);
         $reglement->setAbonnement($abonnement);
         $manager->persist($reglement);
+
 
 
         // ==========================================
