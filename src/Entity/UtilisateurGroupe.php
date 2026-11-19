@@ -4,20 +4,24 @@ namespace App\Entity;
 
 use App\Repository\UtilisateurGroupeRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: UtilisateurGroupeRepository::class)]
 class UtilisateurGroupe
 {
+    #[Groups(['api_read'])]
     #[ORM\Id]
     #[ORM\ManyToOne(inversedBy: 'groupes')]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     private ?Utilisateur $utilisateur = null;
 
+    #[Groups(['api_read'])]
     #[ORM\Id]
     #[ORM\ManyToOne(inversedBy: 'utilisateurs')]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     private ?Groupe $groupe = null;
 
+    #[Groups(['api_read'])]
     #[ORM\Column(nullable: true)]
     private ?\DateTime $date_affectation = null;
 
