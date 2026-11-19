@@ -20,24 +20,31 @@ class Produit
     #[ORM\Column(name: 'id_produit')]
     private ?int $id = null;
 
+    #[Groups(['api_read'])]
     #[ORM\Column(length: 120)]
     private ?string $nom = null;
 
+    #[Groups(['api_read'])]
     #[ORM\Column(length: 30)]
     private ?string $unite = null;
 
+    #[Groups(['api_read'])]
     #[ORM\Column(type: Types::DECIMAL, precision: 8, scale: 2)]
     private ?string $prix = null;
 
+    #[Groups(['api_read'])]
     #[ORM\Column(type: Types::DECIMAL, precision: 5, scale: 2, nullable: true)]
     private ?string $marge = null;
 
+    #[Groups(['api_read'])]
     #[ORM\Column(options: ['default' => 1])]
     private ?int $encombrement_cagettes = 1;
 
+    #[Groups(['api_read'])]
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $photo_url = null;
 
+    #[Groups(['api_read'])]
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $description = null;
 
