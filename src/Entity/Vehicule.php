@@ -33,6 +33,7 @@ class Vehicule
     #[ORM\Column (options: ['default' => true])]
     private ?bool $actif = true;
 
+    #[Groups(['api_read'])]
     #[ORM\ManyToOne(inversedBy: 'vehicules')]
     #[ORM\JoinColumn(name: 'id_structure', nullable: false)]
     private ?Structure $structure = null;
@@ -70,6 +71,18 @@ class Vehicule
     public function setNomModel(?string $nom_model): static
     {
         $this->nom_modele = $nom_model;
+
+        return $this;
+    }
+
+    public function getNomModele(): ?string
+    {
+        return $this->nom_modele;
+    }
+
+    public function setNomModele(?string $nom_modele): static
+    {
+        $this->nom_modele = $nom_modele;
 
         return $this;
     }
