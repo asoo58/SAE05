@@ -12,23 +12,29 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\UniqueConstraint(name: 'uniq_tournee_structure_code', columns: ['id_structure', 'code_tournee'])]
 class Tournee
 {
+    #[Groups(['api_read'])]
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
+    #[Groups(['api_read'])]
     #[ORM\Column(length: 20)]
     private ?string $code_tournee = null;
 
+    #[Groups(['api_read'])]
     #[ORM\Column(length: 100, nullable: true)]
     private ?string $nom = null;
 
+    #[Groups(['api_read'])]
     #[ORM\Column(length: 15, nullable: true)]
     private ?string $jour_preparation = null;
 
+    #[Groups(['api_read'])]
     #[ORM\Column(length: 15, nullable: true)]
     private ?string $jour_livraison = null;
 
+    #[Groups(['api_read'])]
     #[ORM\Column(length: 7, options: ['default' => '#2E7D32'])]
     private ?string $couleur = '#2E7D32';
 
