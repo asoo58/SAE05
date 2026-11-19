@@ -42,6 +42,7 @@ class Tournee
     #[ORM\ManyToOne(targetEntity: Vehicule::class)]
     private ?Vehicule $vehicule = null;
 
+    #[Groups(['api_read'])]
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(name: 'id_structure', nullable: false)]
     private ?Structure $structure = null;
