@@ -6,18 +6,22 @@ use App\Repository\IngredientRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: IngredientRepository::class)]
 class Ingredient
 {
+    #[Groups(['api_read'])]
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
-   #[ORM\Column(length: 100, unique: true)]
+    #[Groups(['api_read'])]
+    #[ORM\Column(length: 100, unique: true)]
     private ?string $nom = null;
 
+    #[Groups(['api_read'])]
     #[ORM\Column(length: 50, nullable: true)]
     private ?string $rayon = null;
 
