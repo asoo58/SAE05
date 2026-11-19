@@ -39,21 +39,27 @@ use Doctrine\Common\Collections\Collection;
     #[ORM\Column]
     private ?string $password = null;
 
+    #[Groups(['api_read'])]
     #[ORM\Column(length: 100)]
     private ?string $nom = null;
 
+    #[Groups(['api_read'])]
     #[ORM\Column(length: 100)]
     private ?string $prenom = null;
 
+    #[Groups(['api_read'])]
     #[ORM\Column(length: 20, nullable: true)]
     private ?string $telephone = null;
 
+    #[Groups(['api_read'])]
     #[ORM\Column(options: ['default' => true])]
     private ?bool $actif = null;
 
+    #[Groups(['api_read'])]
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE, options: ['default' => 'CURRENT_TIMESTAMP'])]
     private \DateTimeImmutable $date_creation;
 
+    #[Groups(['api_read'])]
     #[ORM\ManyToOne(inversedBy: 'utilisateurs')]
     #[ORM\JoinColumn(name: 'id_structure', nullable: false)]
     private ?Structure $structure = null;
