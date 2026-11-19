@@ -5,21 +5,26 @@ namespace App\Entity;
 use App\Repository\TypeAdhesionRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: TypeAdhesionRepository::class)]
 class TypeAdhesion
 {
+    #[Groups(['api_read'])]
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
+    #[Groups(['api_read'])]
     #[ORM\Column(length: 100)]
     private ?string $libelle = null;
 
+    #[Groups(['api_read'])]
     #[ORM\Column(type: Types::DECIMAL, precision: 6, scale: 2)]
     private ?string $montant = null;
 
+    #[Groups(['api_read'])]
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(name: 'id_structure', nullable: false)]
     private ?Structure $structure = null;
