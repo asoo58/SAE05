@@ -5,36 +5,46 @@ namespace App\Entity;
 use App\Repository\LivraisonTourneeRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: LivraisonTourneeRepository::class)]
 class LivraisonTournee
 {
+    #[Groups(['api_read'])]
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
+    #[Groups(['api_read'])]
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     private ?\DateTime $date_livraison = null;
 
+    #[Groups(['api_read'])]
     #[ORM\Column(length: 30, options: ['default' => 'planifiee'])]
     private ?string $statut = 'planifiee';
 
+    #[Groups(['api_read'])]
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $itineraire_geojson = null;
 
+    #[Groups(['api_read'])]
     #[ORM\Column(type: Types::DECIMAL, precision: 6, scale: 2, nullable: true)]
     private ?string $distance_km = null;
 
+    #[Groups(['api_read'])]
     #[ORM\Column(nullable: true)]
     private ?int $duree_minutes = null;
 
+    #[Groups(['api_read'])]
     #[ORM\ManyToOne]
     private ?Tournee $tournee = null;
 
+    #[Groups(['api_read'])]
     #[ORM\ManyToOne]
     private ?Vehicule $vehicule = null;
 
+    #[Groups(['api_read'])]
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false, referencedColumnName: 'id_chauffeur')]
     private ?Chauffeur $chauffeur = null;

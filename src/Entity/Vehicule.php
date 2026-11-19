@@ -6,24 +6,30 @@ use App\Repository\VehiculeRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: VehiculeRepository::class)]
 class Vehicule
 {
+    #[Groups(['api_read'])]
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
+    #[Groups(['api_read'])]
     #[ORM\Column(length: 15, unique: true)]
     private ?string $immatriculation = null;
 
+    #[Groups(['api_read'])]
     #[ORM\Column(name: 'nom_modele', length: 50, nullable: true)]
     private ?string $nom_modele = null;
 
+    #[Groups(['api_read'])]
     #[ORM\Column]
     private ?int $capacite_panier = null;
 
+    #[Groups(['api_read'])]
     #[ORM\Column (options: ['default' => true])]
     private ?bool $actif = true;
 
