@@ -28,39 +28,51 @@ class Structure
     #[ORM\Column(name: 'raison_sociale', length: 150)]
     private ?string $raison_social = null;
 
+    #[Groups(['api_read'])]
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $logo_url = null;
 
+    #[Groups(['api_read'])]
     #[ORM\Column(length: 255)]
     private ?string $siege_social_adresse = null;
 
+    #[Groups(['api_read'])]
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $adresse_gestion = null;
 
+    #[Groups(['api_read'])]
     #[ORM\Column(length: 20, nullable: true)]
     private ?string $telephone = null;
 
+    #[Groups(['api_read'])]
     #[ORM\Column(length: 150, nullable: true)]
     private ?string $email = null;
 
+    #[Groups(['api_read'])]
     #[ORM\Column(length: 14, nullable: true, unique: true)]
     private ?string $siret = null;
 
+    #[Groups(['api_read'])]
     #[ORM\Column(length: 11, nullable: true)]
     private ?string $bic = null;
 
+    #[Groups(['api_read'])]
     #[ORM\Column(length: 34, nullable: true)]
     private ?string $iban = null;
 
+    #[Groups(['api_read'])]
     #[ORM\Column(length: 35, nullable: true)]
     private ?string $ics = null;
 
+    #[Groups(['api_read'])]
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 7, nullable: true)]
     private ?string $point_depart_lat = null;
 
+    #[Groups(['api_read'])]
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 7, nullable: true)]
     private ?string $point_depart_lng = null;
 
+    #[Groups(['api_read'])]
     #[ORM\Column(options: ['default' => false])]
     private ?bool $assujetti_tva = false;
 
