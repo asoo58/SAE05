@@ -1,7 +1,15 @@
 doctrine:
     dbal:
         url: '%env(resolve:DATABASE_URL)%'
+        
+        # 1. On déclare les types dans le dictionnaire interne
+        types:
+            tsvector: Doctrine\DBAL\Types\StringType
+            vector: Doctrine\DBAL\Types\StringType
+            
+        # 2. On indique comment les mapper
         mapping_types:
+            tsvector: string
             vector: string
 
         # IMPORTANT: You MUST configure your server version,
