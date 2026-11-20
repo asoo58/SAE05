@@ -11,10 +11,12 @@ use Symfony\Component\Routing\Attribute\Route;
 class AuthController extends AbstractController
 {
     #[Route('/api/login_check', name: 'swagger_login_check', methods: ['POST'])]
+    #[OA\Post(summary: 'Authentification JWT')]
     #[OA\RequestBody(
         description: 'Identifiants de connexion',
         required: true,
         content: new OA\JsonContent(
+            required: ['username', 'password'],
             properties: [
                 new OA\Property(property: 'username', type: 'string', example: 'prof@cocagne.fr', description: 'Adresse email (obligatoirement nommée username pour le pare-feu)'),
                 new OA\Property(property: 'password', type: 'string', example: 'test')
@@ -30,6 +32,7 @@ class AuthController extends AbstractController
             ]
         )
     )]
+    #[OA\Response(response: 400, description: 'Données invalides ou corps JSON manquant.')]
     #[OA\Response(response: 401, description: 'Identifiants invalides.')]
     public function login(): JsonResponse
     {

@@ -91,6 +91,7 @@ class Adherent
         $this->abonnements = new ArrayCollection();
     }
 
+    #[Groups(['api_read'])]
     public function getId(): ?int
     {
         return $this->utilisateur?->getId();
