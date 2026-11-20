@@ -14,19 +14,36 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
 #[Route('/api/calendrier-jours')]
-#[OA\Tag(name: 'CalendrierJour', description: 'Gestion des jours du calendrier de livraison')]
+#[OA\Tag(name: 'Jours de calendrier', description: 'Gestion des jours du calendrier de livraison')]
 final class CalendrierJourController extends AbstractController
 {
     #[Route('', name: 'api_calendrier_jour_index', methods: ['GET'])]
+    #[OA\Get(summary: 'Liste des jours de calendrier')]
+    #[OA\Parameter(
+        name: 'id_calendrier',
+        in: 'query',
+        required: false,
+        description: 'Filtrer par identifiant de calendrier',
+        schema: new OA\Schema(type: 'integer')
+    )]
     #[OA\Response(response: 200, description: 'Liste des jours de calendrier')]
-    public function index(CalendrierJourRepository $repository): JsonResponse
+    public function index(Request $request, CalendrierJourRepository $repository): JsonResponse
     {
-        $jours = $repository->findAll();
+        $criteres = [];
+        if ($request->query->has('id_calendrier') && $request->query->get('id_calendrier') !== '') {
+            $criteres['calendrier'] = (int) $request->query->get('id_calendrier');
+        }
+
+        $jours = !empty($criteres)
+            ? $repository->findBy($criteres, ['date_livraison' => 'ASC'])
+            : $repository->findBy([], ['date_livraison' => 'ASC']);
 
         return $this->json($jours, Response::HTTP_OK, [], ['groups' => 'api_read']);
     }
 
     #[Route('/{id}', name: 'api_calendrier_jour_show', methods: ['GET'])]
+    #[OA\Get(summary: 'Détail d\'un jour de calendrier')]
+    #[OA\Parameter(name: 'id', in: 'path', description: 'Identifiant du jour de calendrier', required: true, schema: new OA\Schema(type: 'integer', example: 1))]
     #[OA\Response(response: 200, description: 'Détail d\'un jour de calendrier')]
     #[OA\Response(response: 404, description: 'Jour introuvable')]
     public function show(CalendrierJour $calendrierJour): JsonResponse
@@ -35,6 +52,7 @@ final class CalendrierJourController extends AbstractController
     }
 
     #[Route('', name: 'api_calendrier_jour_create', methods: ['POST'])]
+    #[OA\Post(summary: 'Créer un jour de calendrier')]
     #[OA\RequestBody(
         required: true,
         content: new OA\JsonContent(
@@ -49,7 +67,7 @@ final class CalendrierJourController extends AbstractController
             ]
         )
     )]
-    #[OA\Response(response: 201, description: 'Jour de calendrier créé')]
+    #[OA\Response(response: 201, description: 'Jour de calendrier créé avec succès')]
     #[OA\Response(response: 400, description: 'Données invalides ou manquantes')]
     #[OA\Response(response: 404, description: 'Calendrier introuvable')]
     public function create(
@@ -98,8 +116,11 @@ final class CalendrierJourController extends AbstractController
     }
 
     #[Route('/{id}', name: 'api_calendrier_jour_update', methods: ['PUT', 'PATCH'])]
+    #[OA\Put(summary: 'Modifier un jour de calendrier')]
+    #[OA\Patch(summary: 'Modifier partiellement un jour de calendrier')]
+    #[OA\Parameter(name: 'id', in: 'path', description: 'Identifiant du jour de calendrier', required: true, schema: new OA\Schema(type: 'integer', example: 1))]
     #[OA\RequestBody(
-        required: true,
+        required: false,
         content: new OA\JsonContent(
             properties: [
                 new OA\Property(property: 'date_livraison', type: 'string', format: 'date', example: '2026-11-25'),
@@ -111,7 +132,7 @@ final class CalendrierJourController extends AbstractController
             ]
         )
     )]
-    #[OA\Response(response: 200, description: 'Jour de calendrier mis à jour')]
+    #[OA\Response(response: 200, description: 'Jour de calendrier mis à jour avec succès')]
     #[OA\Response(response: 400, description: 'Format de date invalide')]
     #[OA\Response(response: 404, description: 'Jour ou calendrier introuvable')]
     public function update(
@@ -163,7 +184,9 @@ final class CalendrierJourController extends AbstractController
     }
 
     #[Route('/{id}', name: 'api_calendrier_jour_delete', methods: ['DELETE'])]
-    #[OA\Response(response: 204, description: 'Jour de calendrier supprimé')]
+    #[OA\Delete(summary: 'Supprimer un jour de calendrier')]
+    #[OA\Parameter(name: 'id', in: 'path', description: 'Identifiant du jour de calendrier à supprimer', required: true, schema: new OA\Schema(type: 'integer', example: 1))]
+    #[OA\Response(response: 204, description: 'Jour de calendrier supprimé avec succès')]
     #[OA\Response(response: 404, description: 'Jour introuvable')]
     public function delete(CalendrierJour $calendrierJour, EntityManagerInterface $em): JsonResponse
     {
