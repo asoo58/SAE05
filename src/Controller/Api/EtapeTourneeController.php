@@ -19,6 +19,7 @@ use Symfony\Component\Routing\Attribute\Route;
 final class EtapeTourneeController extends AbstractController
 {
     #[Route('', name: 'api_etape_tournees_index', methods: ['GET'])]
+    #[OA\Get(summary: 'Liste des étapes de tournée')]
     #[OA\Parameter(
         name: 'id_tournee',
         in: 'query',
@@ -26,7 +27,7 @@ final class EtapeTourneeController extends AbstractController
         required: false,
         schema: new OA\Schema(type: 'integer')
     )]
-    #[OA\Response(response: 200, description: 'Liste des étapes de tournée')]
+    #[OA\Response(response: 200, description: 'Liste des étapes de tournée retournée avec succès')]
     public function index(Request $request, EtapeTourneeRepository $repository): JsonResponse
     {
         $idTournee = $request->query->get('id_tournee') ?? $request->query->get('tournee_id');
@@ -42,9 +43,10 @@ final class EtapeTourneeController extends AbstractController
     }
 
     #[Route('/{tourneeId}/{depotId}', name: 'api_etape_tournees_show', methods: ['GET'])]
-    #[OA\Parameter(name: 'tourneeId', in: 'path', description: 'Identifiant de la tournée', required: true, schema: new OA\Schema(type: 'integer'))]
-    #[OA\Parameter(name: 'depotId', in: 'path', description: 'Identifiant du dépôt', required: true, schema: new OA\Schema(type: 'integer'))]
-    #[OA\Response(response: 200, description: 'Détail d\'une étape de tournée')]
+    #[OA\Get(summary: 'Détail d\'une étape de tournée')]
+    #[OA\Parameter(name: 'tourneeId', in: 'path', description: 'Identifiant de la tournée', required: true, schema: new OA\Schema(type: 'integer', example: 1))]
+    #[OA\Parameter(name: 'depotId', in: 'path', description: 'Identifiant du dépôt', required: true, schema: new OA\Schema(type: 'integer', example: 2))]
+    #[OA\Response(response: 200, description: 'Détail de l\'étape de tournée retourné avec succès')]
     #[OA\Response(response: 404, description: 'Étape introuvable')]
     public function show(int $tourneeId, int $depotId, EtapeTourneeRepository $repository): JsonResponse
     {
@@ -58,7 +60,9 @@ final class EtapeTourneeController extends AbstractController
     }
 
     #[Route('', name: 'api_etape_tournees_create', methods: ['POST'])]
+    #[OA\Post(summary: 'Créer une étape de tournée')]
     #[OA\RequestBody(
+        description: 'Données requises pour associer un dépôt à une tournée',
         required: true,
         content: new OA\JsonContent(
             required: ['id_tournee', 'id_depot'],
@@ -137,10 +141,13 @@ final class EtapeTourneeController extends AbstractController
     }
 
     #[Route('/{tourneeId}/{depotId}', name: 'api_etape_tournees_update', methods: ['PUT', 'PATCH'])]
-    #[OA\Parameter(name: 'tourneeId', in: 'path', description: 'Identifiant de la tournée', required: true, schema: new OA\Schema(type: 'integer'))]
-    #[OA\Parameter(name: 'depotId', in: 'path', description: 'Identifiant du dépôt', required: true, schema: new OA\Schema(type: 'integer'))]
+    #[OA\Put(summary: 'Modifier une étape de tournée')]
+    #[OA\Patch(summary: 'Modifier partiellement une étape de tournée')]
+    #[OA\Parameter(name: 'tourneeId', in: 'path', description: 'Identifiant de la tournée', required: true, schema: new OA\Schema(type: 'integer', example: 1))]
+    #[OA\Parameter(name: 'depotId', in: 'path', description: 'Identifiant du dépôt', required: true, schema: new OA\Schema(type: 'integer', example: 2))]
     #[OA\RequestBody(
-        required: true,
+        description: 'Champs de l\'étape à mettre à jour',
+        required: false,
         content: new OA\JsonContent(
             properties: [
                 new OA\Property(property: 'ordre_passage', type: 'integer', example: 2),
@@ -148,7 +155,7 @@ final class EtapeTourneeController extends AbstractController
             ]
         )
     )]
-    #[OA\Response(response: 200, description: 'Étape de tournée mise à jour')]
+    #[OA\Response(response: 200, description: 'Étape de tournée mise à jour avec succès')]
     #[OA\Response(response: 400, description: 'Format d\'heure invalide')]
     #[OA\Response(response: 404, description: 'Étape introuvable')]
     public function update(
@@ -191,9 +198,10 @@ final class EtapeTourneeController extends AbstractController
     }
 
     #[Route('/{tourneeId}/{depotId}', name: 'api_etape_tournees_delete', methods: ['DELETE'])]
-    #[OA\Parameter(name: 'tourneeId', in: 'path', description: 'Identifiant de la tournée', required: true, schema: new OA\Schema(type: 'integer'))]
-    #[OA\Parameter(name: 'depotId', in: 'path', description: 'Identifiant du dépôt', required: true, schema: new OA\Schema(type: 'integer'))]
-    #[OA\Response(response: 204, description: 'Étape de tournée supprimée')]
+    #[OA\Delete(summary: 'Supprimer une étape de tournée')]
+    #[OA\Parameter(name: 'tourneeId', in: 'path', description: 'Identifiant de la tournée', required: true, schema: new OA\Schema(type: 'integer', example: 1))]
+    #[OA\Parameter(name: 'depotId', in: 'path', description: 'Identifiant du dépôt', required: true, schema: new OA\Schema(type: 'integer', example: 2))]
+    #[OA\Response(response: 204, description: 'Étape de tournée supprimée avec succès')]
     #[OA\Response(response: 404, description: 'Étape introuvable')]
     public function delete(
         int $tourneeId,

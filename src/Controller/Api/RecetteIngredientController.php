@@ -19,21 +19,22 @@ use Symfony\Component\Routing\Attribute\Route;
 final class RecetteIngredientController extends AbstractController
 {
     #[Route('', name: 'api_recette_ingredients_index', methods: ['GET'])]
+    #[OA\Get(summary: 'Liste des ingrédients de recette')]
     #[OA\Parameter(
         name: 'id_recette',
         in: 'query',
         description: 'Filtrer par identifiant de recette',
         required: false,
-        schema: new OA\Schema(type: 'integer')
+        schema: new OA\Schema(type: 'integer', example: 1)
     )]
     #[OA\Parameter(
         name: 'id_ingredient',
         in: 'query',
         description: 'Filtrer par identifiant d\'ingrédient',
         required: false,
-        schema: new OA\Schema(type: 'integer')
+        schema: new OA\Schema(type: 'integer', example: 3)
     )]
-    #[OA\Response(response: 200, description: 'Liste des ingrédients associés aux recettes')]
+    #[OA\Response(response: 200, description: 'Liste des ingrédients associés aux recettes retournée avec succès')]
     public function index(Request $request, RecetteIngredientRepository $repository): JsonResponse
     {
         $idRecette = $request->query->get('id_recette') ?? $request->query->get('recette_id');
@@ -53,9 +54,10 @@ final class RecetteIngredientController extends AbstractController
     }
 
     #[Route('/{recetteId}/{ingredientId}', name: 'api_recette_ingredients_show', methods: ['GET'])]
-    #[OA\Parameter(name: 'recetteId', in: 'path', description: 'Identifiant de la recette', required: true, schema: new OA\Schema(type: 'integer'))]
-    #[OA\Parameter(name: 'ingredientId', in: 'path', description: 'Identifiant de l\'ingrédient', required: true, schema: new OA\Schema(type: 'integer'))]
-    #[OA\Response(response: 200, description: 'Détail d\'un ingrédient de recette')]
+    #[OA\Get(summary: 'Détail d\'un ingrédient de recette')]
+    #[OA\Parameter(name: 'recetteId', in: 'path', description: 'Identifiant de la recette', required: true, schema: new OA\Schema(type: 'integer', example: 1))]
+    #[OA\Parameter(name: 'ingredientId', in: 'path', description: 'Identifiant de l\'ingrédient', required: true, schema: new OA\Schema(type: 'integer', example: 3))]
+    #[OA\Response(response: 200, description: 'Détail de l\'ingrédient de recette retourné avec succès')]
     #[OA\Response(response: 404, description: 'Association introuvable')]
     public function show(int $recetteId, int $ingredientId, RecetteIngredientRepository $repository): JsonResponse
     {
@@ -69,7 +71,9 @@ final class RecetteIngredientController extends AbstractController
     }
 
     #[Route('', name: 'api_recette_ingredients_create', methods: ['POST'])]
+    #[OA\Post(summary: 'Créer un ingrédient de recette')]
     #[OA\RequestBody(
+        description: 'Données requises pour associer un ingrédient à une recette',
         required: true,
         content: new OA\JsonContent(
             required: ['id_recette', 'id_ingredient'],
@@ -81,7 +85,7 @@ final class RecetteIngredientController extends AbstractController
             ]
         )
     )]
-    #[OA\Response(response: 201, description: 'Ingrédient ajouté à la recette')]
+    #[OA\Response(response: 201, description: 'Ingrédient ajouté à la recette avec succès')]
     #[OA\Response(response: 400, description: 'Données invalides ou identifiants manquants')]
     #[OA\Response(response: 404, description: 'Recette ou ingrédient introuvable')]
     #[OA\Response(response: 409, description: 'Cet ingrédient est déjà présent dans cette recette')]
@@ -140,10 +144,13 @@ final class RecetteIngredientController extends AbstractController
     }
 
     #[Route('/{recetteId}/{ingredientId}', name: 'api_recette_ingredients_update', methods: ['PUT', 'PATCH'])]
-    #[OA\Parameter(name: 'recetteId', in: 'path', description: 'Identifiant de la recette', required: true, schema: new OA\Schema(type: 'integer'))]
-    #[OA\Parameter(name: 'ingredientId', in: 'path', description: 'Identifiant de l\'ingrédient', required: true, schema: new OA\Schema(type: 'integer'))]
+    #[OA\Put(summary: 'Modifier un ingrédient de recette')]
+    #[OA\Patch(summary: 'Modifier partiellement un ingrédient de recette')]
+    #[OA\Parameter(name: 'recetteId', in: 'path', description: 'Identifiant de la recette', required: true, schema: new OA\Schema(type: 'integer', example: 1))]
+    #[OA\Parameter(name: 'ingredientId', in: 'path', description: 'Identifiant de l\'ingrédient', required: true, schema: new OA\Schema(type: 'integer', example: 3))]
     #[OA\RequestBody(
-        required: true,
+        description: 'Champs de l\'association à mettre à jour',
+        required: false,
         content: new OA\JsonContent(
             properties: [
                 new OA\Property(property: 'quantite', type: 'string', example: '750.00'),
@@ -151,7 +158,7 @@ final class RecetteIngredientController extends AbstractController
             ]
         )
     )]
-    #[OA\Response(response: 200, description: 'Association mise à jour')]
+    #[OA\Response(response: 200, description: 'Ingrédient de recette mis à jour avec succès')]
     #[OA\Response(response: 404, description: 'Association introuvable')]
     public function update(
         int $recetteId,
@@ -181,9 +188,10 @@ final class RecetteIngredientController extends AbstractController
     }
 
     #[Route('/{recetteId}/{ingredientId}', name: 'api_recette_ingredients_delete', methods: ['DELETE'])]
-    #[OA\Parameter(name: 'recetteId', in: 'path', description: 'Identifiant de la recette', required: true, schema: new OA\Schema(type: 'integer'))]
-    #[OA\Parameter(name: 'ingredientId', in: 'path', description: 'Identifiant de l\'ingrédient', required: true, schema: new OA\Schema(type: 'integer'))]
-    #[OA\Response(response: 204, description: 'Ingrédient retiré de la recette')]
+    #[OA\Delete(summary: 'Supprimer un ingrédient de recette')]
+    #[OA\Parameter(name: 'recetteId', in: 'path', description: 'Identifiant de la recette', required: true, schema: new OA\Schema(type: 'integer', example: 1))]
+    #[OA\Parameter(name: 'ingredientId', in: 'path', description: 'Identifiant de l\'ingrédient', required: true, schema: new OA\Schema(type: 'integer', example: 3))]
+    #[OA\Response(response: 204, description: 'Ingrédient retiré de la recette avec succès')]
     #[OA\Response(response: 404, description: 'Association introuvable')]
     public function delete(
         int $recetteId,

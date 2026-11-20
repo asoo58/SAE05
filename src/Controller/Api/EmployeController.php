@@ -18,7 +18,8 @@ use Symfony\Component\Routing\Attribute\Route;
 final class EmployeController extends AbstractController
 {
     #[Route('', name: 'api_employes_index', methods: ['GET'])]
-    #[OA\Response(response: 200, description: 'Liste des employés')]
+    #[OA\Get(summary: 'Liste des employés')]
+    #[OA\Response(response: 200, description: 'Liste des employés retournée avec succès')]
     public function index(EmployeRepository $repository): JsonResponse
     {
         $employes = $repository->findAll();
@@ -27,7 +28,9 @@ final class EmployeController extends AbstractController
     }
 
     #[Route('/{id}', name: 'api_employes_show', methods: ['GET'])]
-    #[OA\Response(response: 200, description: 'Détail d\'un employé')]
+    #[OA\Get(summary: 'Détail d\'un employé')]
+    #[OA\Parameter(name: 'id', in: 'path', description: 'Identifiant unique de l\'employé', required: true, schema: new OA\Schema(type: 'integer', example: 1))]
+    #[OA\Response(response: 200, description: 'Détail de l\'employé retourné avec succès')]
     #[OA\Response(response: 404, description: 'Employé introuvable')]
     public function show(int $id, EmployeRepository $repository): JsonResponse
     {
@@ -41,7 +44,9 @@ final class EmployeController extends AbstractController
     }
 
     #[Route('', name: 'api_employes_create', methods: ['POST'])]
+    #[OA\Post(summary: 'Créer un employé')]
     #[OA\RequestBody(
+        description: 'Données requises pour créer un employé',
         required: true,
         content: new OA\JsonContent(
             required: ['id_utilisateur'],
@@ -117,8 +122,12 @@ final class EmployeController extends AbstractController
     }
 
     #[Route('/{id}', name: 'api_employes_update', methods: ['PUT', 'PATCH'])]
+    #[OA\Put(summary: 'Modifier un employé')]
+    #[OA\Patch(summary: 'Modifier partiellement un employé')]
+    #[OA\Parameter(name: 'id', in: 'path', description: 'Identifiant unique de l\'employé à modifier', required: true, schema: new OA\Schema(type: 'integer', example: 1))]
     #[OA\RequestBody(
-        required: true,
+        description: 'Champs de l\'employé à modifier',
+        required: false,
         content: new OA\JsonContent(
             properties: [
                 new OA\Property(property: 'poste', type: 'string', maxLength: 50, nullable: true, example: 'Chef de culture'),
@@ -128,7 +137,7 @@ final class EmployeController extends AbstractController
             ]
         )
     )]
-    #[OA\Response(response: 200, description: 'Employé mis à jour')]
+    #[OA\Response(response: 200, description: 'Employé mis à jour avec succès')]
     #[OA\Response(response: 400, description: 'Format de date invalide')]
     #[OA\Response(response: 404, description: 'Employé introuvable')]
     public function update(
@@ -175,7 +184,9 @@ final class EmployeController extends AbstractController
     }
 
     #[Route('/{id}', name: 'api_employes_delete', methods: ['DELETE'])]
-    #[OA\Response(response: 204, description: 'Employé supprimé')]
+    #[OA\Delete(summary: 'Supprimer un employé')]
+    #[OA\Parameter(name: 'id', in: 'path', description: 'Identifiant unique de l\'employé à supprimer', required: true, schema: new OA\Schema(type: 'integer', example: 1))]
+    #[OA\Response(response: 204, description: 'Employé supprimé avec succès')]
     #[OA\Response(response: 404, description: 'Employé introuvable')]
     public function delete(
         int $id,

@@ -20,10 +20,11 @@ use Symfony\Component\Routing\Attribute\Route;
 final class LivraisonTourneeController extends AbstractController
 {
     #[Route('', name: 'api_livraison_tournees_index', methods: ['GET'])]
-    #[OA\Parameter(name: 'statut', in: 'query', description: 'Filtrer par statut', required: false, schema: new OA\Schema(type: 'string'))]
-    #[OA\Parameter(name: 'id_tournee', in: 'query', description: 'Filtrer par tournée', required: false, schema: new OA\Schema(type: 'integer'))]
-    #[OA\Parameter(name: 'id_chauffeur', in: 'query', description: 'Filtrer par chauffeur', required: false, schema: new OA\Schema(type: 'integer'))]
-    #[OA\Response(response: 200, description: 'Liste des livraisons de tournée')]
+    #[OA\Get(summary: 'Liste des livraisons de tournée')]
+    #[OA\Parameter(name: 'statut', in: 'query', description: 'Filtrer par statut', required: false, schema: new OA\Schema(type: 'string', example: 'planifiee'))]
+    #[OA\Parameter(name: 'id_tournee', in: 'query', description: 'Filtrer par identifiant de tournée', required: false, schema: new OA\Schema(type: 'integer', example: 1))]
+    #[OA\Parameter(name: 'id_chauffeur', in: 'query', description: 'Filtrer par identifiant de chauffeur', required: false, schema: new OA\Schema(type: 'integer', example: 1))]
+    #[OA\Response(response: 200, description: 'Liste des livraisons de tournée retournée avec succès')]
     public function index(Request $request, LivraisonTourneeRepository $repository): JsonResponse
     {
         $criteres = [];
@@ -50,7 +51,9 @@ final class LivraisonTourneeController extends AbstractController
     }
 
     #[Route('/{id}', name: 'api_livraison_tournees_show', methods: ['GET'])]
-    #[OA\Response(response: 200, description: 'Détail d\'une livraison de tournée')]
+    #[OA\Get(summary: 'Détail d\'une livraison de tournée')]
+    #[OA\Parameter(name: 'id', in: 'path', description: 'Identifiant unique de la livraison', required: true, schema: new OA\Schema(type: 'integer', example: 1))]
+    #[OA\Response(response: 200, description: 'Détail de la livraison retourné avec succès')]
     #[OA\Response(response: 404, description: 'Livraison introuvable')]
     public function show(int $id, LivraisonTourneeRepository $repository): JsonResponse
     {
@@ -64,7 +67,9 @@ final class LivraisonTourneeController extends AbstractController
     }
 
     #[Route('', name: 'api_livraison_tournees_create', methods: ['POST'])]
+    #[OA\Post(summary: 'Créer une livraison de tournée')]
     #[OA\RequestBody(
+        description: 'Données requises pour programmer une livraison de tournée',
         required: true,
         content: new OA\JsonContent(
             required: ['date_livraison', 'id_chauffeur'],
@@ -163,8 +168,12 @@ final class LivraisonTourneeController extends AbstractController
     }
 
     #[Route('/{id}', name: 'api_livraison_tournees_update', methods: ['PUT', 'PATCH'])]
+    #[OA\Put(summary: 'Modifier une livraison de tournée')]
+    #[OA\Patch(summary: 'Modifier partiellement une livraison de tournée')]
+    #[OA\Parameter(name: 'id', in: 'path', description: 'Identifiant unique de la livraison à modifier', required: true, schema: new OA\Schema(type: 'integer', example: 1))]
     #[OA\RequestBody(
-        required: true,
+        description: 'Champs de la livraison à mettre à jour',
+        required: false,
         content: new OA\JsonContent(
             properties: [
                 new OA\Property(property: 'date_livraison', type: 'string', format: 'date', example: '2026-11-21'),
@@ -178,7 +187,7 @@ final class LivraisonTourneeController extends AbstractController
             ]
         )
     )]
-    #[OA\Response(response: 200, description: 'Livraison mise à jour')]
+    #[OA\Response(response: 200, description: 'Livraison mise à jour avec succès')]
     #[OA\Response(response: 400, description: 'Données invalides')]
     #[OA\Response(response: 404, description: 'Livraison, tournée, véhicule ou chauffeur introuvable')]
     public function update(
@@ -265,7 +274,9 @@ final class LivraisonTourneeController extends AbstractController
     }
 
     #[Route('/{id}', name: 'api_livraison_tournees_delete', methods: ['DELETE'])]
-    #[OA\Response(response: 204, description: 'Livraison supprimée')]
+    #[OA\Delete(summary: 'Supprimer une livraison de tournée')]
+    #[OA\Parameter(name: 'id', in: 'path', description: 'Identifiant unique de la livraison à supprimer', required: true, schema: new OA\Schema(type: 'integer', example: 1))]
+    #[OA\Response(response: 204, description: 'Livraison supprimée avec succès')]
     #[OA\Response(response: 404, description: 'Livraison introuvable')]
     public function delete(
         int $id,

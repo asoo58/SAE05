@@ -18,6 +18,7 @@ use Symfony\Component\Routing\Attribute\Route;
 final class RecetteController extends AbstractController
 {
     #[Route('', name: 'api_recettes_index', methods: ['GET'])]
+    #[OA\Get(summary: 'Liste des recettes')]
     #[OA\Parameter(
         name: 'partage_national',
         in: 'query',
@@ -25,7 +26,7 @@ final class RecetteController extends AbstractController
         required: false,
         schema: new OA\Schema(type: 'boolean')
     )]
-    #[OA\Response(response: 200, description: 'Liste des recettes')]
+    #[OA\Response(response: 200, description: 'Liste des recettes retournée avec succès')]
     public function index(Request $request, RecetteRepository $repository): JsonResponse
     {
         $criteres = [];
@@ -41,7 +42,9 @@ final class RecetteController extends AbstractController
     }
 
     #[Route('/{id}', name: 'api_recettes_show', methods: ['GET'])]
-    #[OA\Response(response: 200, description: 'Détail d\'une recette')]
+    #[OA\Get(summary: 'Détail d\'une recette')]
+    #[OA\Parameter(name: 'id', in: 'path', description: 'Identifiant unique de la recette', required: true, schema: new OA\Schema(type: 'integer', example: 1))]
+    #[OA\Response(response: 200, description: 'Détail de la recette retourné avec succès')]
     #[OA\Response(response: 404, description: 'Recette introuvable')]
     public function show(int $id, RecetteRepository $repository): JsonResponse
     {
@@ -55,7 +58,9 @@ final class RecetteController extends AbstractController
     }
 
     #[Route('', name: 'api_recettes_create', methods: ['POST'])]
+    #[OA\Post(summary: 'Créer une recette')]
     #[OA\RequestBody(
+        description: 'Données requises pour créer une recette',
         required: true,
         content: new OA\JsonContent(
             required: ['titre', 'instructions'],
@@ -89,22 +94,22 @@ final class RecetteController extends AbstractController
         }
 
         $recette = new Recette();
-        $recette->setTitre(trim((string) $donnees['titre']));
-        $recette->setInstructions(trim((string) $donnees['instructions']));
+        $recette->setTitre($donnees['titre']);
+        $recette->setInstructions($donnees['instructions']);
 
-        if (isset($donnees['description'])) {
+        if (array_key_exists('description', $donnees)) {
             $recette->setDescription($donnees['description']);
         }
-        if (isset($donnees['temps_preparation_min'])) {
-            $recette->setTempsPreparationMin((int) $donnees['temps_preparation_min']);
+        if (array_key_exists('temps_preparation_min', $donnees)) {
+            $recette->setTempsPreparationMin($donnees['temps_preparation_min'] !== null ? (int) $donnees['temps_preparation_min'] : null);
         }
-        if (isset($donnees['temps_cuisson_min'])) {
-            $recette->setTempsCuissonMin((int) $donnees['temps_cuisson_min']);
+        if (array_key_exists('temps_cuisson_min', $donnees)) {
+            $recette->setTempsCuissonMin($donnees['temps_cuisson_min'] !== null ? (int) $donnees['temps_cuisson_min'] : null);
         }
         if (isset($donnees['nb_personnes'])) {
             $recette->setNbPersonnes((int) $donnees['nb_personnes']);
         }
-        if (array_key_exists('partage_national', $donnees)) {
+        if (isset($donnees['partage_national'])) {
             $recette->setPartageNational((bool) $donnees['partage_national']);
         }
 
@@ -124,13 +129,17 @@ final class RecetteController extends AbstractController
     }
 
     #[Route('/{id}', name: 'api_recettes_update', methods: ['PUT', 'PATCH'])]
+    #[OA\Put(summary: 'Modifier une recette')]
+    #[OA\Patch(summary: 'Modifier partiellement une recette')]
+    #[OA\Parameter(name: 'id', in: 'path', description: 'Identifiant unique de la recette à modifier', required: true, schema: new OA\Schema(type: 'integer', example: 1))]
     #[OA\RequestBody(
-        required: true,
+        description: 'Champs de la recette à mettre à jour',
+        required: false,
         content: new OA\JsonContent(
             properties: [
-                new OA\Property(property: 'titre', type: 'string', maxLength: 200, example: 'Velouté onctueux de potimarron'),
-                new OA\Property(property: 'instructions', type: 'string', example: '1. Nettoyer et couper le potimarron...'),
-                new OA\Property(property: 'description', type: 'string', nullable: true, example: 'Version enrichie aux épices douces'),
+                new OA\Property(property: 'titre', type: 'string', maxLength: 200, example: 'Velouté de potimarron aux châtaignes'),
+                new OA\Property(property: 'instructions', type: 'string', example: '1. Couper le potimarron. 2. Ajouter les châtaignes...'),
+                new OA\Property(property: 'description', type: 'string', nullable: true, example: 'Version enrichie aux châtaignes vosgiennes'),
                 new OA\Property(property: 'temps_preparation_min', type: 'integer', nullable: true, example: 20),
                 new OA\Property(property: 'temps_cuisson_min', type: 'integer', nullable: true, example: 30),
                 new OA\Property(property: 'nb_personnes', type: 'integer', example: 6),
@@ -139,15 +148,15 @@ final class RecetteController extends AbstractController
             ]
         )
     )]
-    #[OA\Response(response: 200, description: 'Recette mise à jour')]
+    #[OA\Response(response: 200, description: 'Recette mise à jour avec succès')]
     #[OA\Response(response: 400, description: 'Données invalides')]
     #[OA\Response(response: 404, description: 'Recette ou structure introuvable')]
     public function update(
         int $id,
         Request $request,
         RecetteRepository $repository,
-        EntityManagerInterface $em,
-        StructureRepository $structureRepository
+        StructureRepository $structureRepository,
+        EntityManagerInterface $em
     ): JsonResponse {
         $recette = $repository->find($id);
 
@@ -158,19 +167,17 @@ final class RecetteController extends AbstractController
         $donnees = json_decode($request->getContent(), true) ?? [];
 
         if (array_key_exists('titre', $donnees)) {
-            $titre = trim((string) $donnees['titre']);
-            if ($titre === '') {
-                return $this->json(['error' => 'Le champ titre ne peut pas être vide.'], Response::HTTP_BAD_REQUEST);
+            if (empty($donnees['titre'])) {
+                return $this->json(['error' => 'Le titre ne peut pas être vide.'], Response::HTTP_BAD_REQUEST);
             }
-            $recette->setTitre($titre);
+            $recette->setTitre($donnees['titre']);
         }
 
         if (array_key_exists('instructions', $donnees)) {
-            $instructions = trim((string) $donnees['instructions']);
-            if ($instructions === '') {
-                return $this->json(['error' => 'Le champ instructions ne peut pas être vide.'], Response::HTTP_BAD_REQUEST);
+            if (empty($donnees['instructions'])) {
+                return $this->json(['error' => 'Les instructions ne peuvent pas être vides.'], Response::HTTP_BAD_REQUEST);
             }
-            $recette->setInstructions($instructions);
+            $recette->setInstructions($donnees['instructions']);
         }
 
         if (array_key_exists('description', $donnees)) {
@@ -208,7 +215,9 @@ final class RecetteController extends AbstractController
     }
 
     #[Route('/{id}', name: 'api_recettes_delete', methods: ['DELETE'])]
-    #[OA\Response(response: 204, description: 'Recette supprimée')]
+    #[OA\Delete(summary: 'Supprimer une recette')]
+    #[OA\Parameter(name: 'id', in: 'path', description: 'Identifiant unique de la recette à supprimer', required: true, schema: new OA\Schema(type: 'integer', example: 1))]
+    #[OA\Response(response: 204, description: 'Recette supprimée avec succès')]
     #[OA\Response(response: 404, description: 'Recette introuvable')]
     public function delete(
         int $id,
