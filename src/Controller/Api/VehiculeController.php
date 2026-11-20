@@ -18,6 +18,7 @@ use Symfony\Component\Routing\Attribute\Route;
 final class VehiculeController extends AbstractController
 {
     #[Route('', name: 'api_vehicules_index', methods: ['GET'])]
+    #[OA\Get(summary: 'Liste des véhicules')]
     #[OA\Parameter(
         name: 'id_structure',
         in: 'query',
@@ -51,6 +52,14 @@ final class VehiculeController extends AbstractController
     }
 
     #[Route('/{id}', name: 'api_vehicules_show', methods: ['GET'])]
+    #[OA\Get(summary: "Détail d'un véhicule")]
+    #[OA\Parameter(
+        name: 'id',
+        in: 'path',
+        required: true,
+        description: 'Identifiant unique du véhicule',
+        schema: new OA\Schema(type: 'integer')
+    )]
     #[OA\Response(response: 200, description: 'Détail d\'un véhicule')]
     #[OA\Response(response: 404, description: 'Véhicule introuvable')]
     public function show(int $id, VehiculeRepository $repository): JsonResponse
@@ -65,6 +74,7 @@ final class VehiculeController extends AbstractController
     }
 
     #[Route('', name: 'api_vehicules_create', methods: ['POST'])]
+    #[OA\Post(summary: 'Créer un véhicule')]
     #[OA\RequestBody(
         required: true,
         content: new OA\JsonContent(
@@ -137,8 +147,17 @@ final class VehiculeController extends AbstractController
     }
 
     #[Route('/{id}', name: 'api_vehicules_update', methods: ['PUT', 'PATCH'])]
-    #[OA\RequestBody(
+    #[OA\Put(summary: 'Modifier un véhicule')]
+    #[OA\Patch(summary: 'Modifier partiellement un véhicule')]
+    #[OA\Parameter(
+        name: 'id',
+        in: 'path',
         required: true,
+        description: 'Identifiant unique du véhicule',
+        schema: new OA\Schema(type: 'integer')
+    )]
+    #[OA\RequestBody(
+        required: false,
         content: new OA\JsonContent(
             properties: [
                 new OA\Property(property: 'immatriculation', type: 'string', maxLength: 15, example: 'AB-123-CD'),
@@ -219,6 +238,14 @@ final class VehiculeController extends AbstractController
     }
 
     #[Route('/{id}', name: 'api_vehicules_delete', methods: ['DELETE'])]
+    #[OA\Delete(summary: 'Supprimer un véhicule')]
+    #[OA\Parameter(
+        name: 'id',
+        in: 'path',
+        required: true,
+        description: 'Identifiant unique du véhicule',
+        schema: new OA\Schema(type: 'integer')
+    )]
     #[OA\Response(response: 204, description: 'Véhicule supprimé')]
     #[OA\Response(response: 404, description: 'Véhicule introuvable')]
     public function delete(

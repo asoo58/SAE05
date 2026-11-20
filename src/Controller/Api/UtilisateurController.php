@@ -23,6 +23,7 @@ class UtilisateurController extends AbstractController
 {
     #[Route('', name: 'api_utilisateurs_get', methods: ['GET'])]
     #[IsGranted('IS_AUTHENTICATED_FULLY')]
+    #[OA\Get(summary: 'Liste des utilisateurs')]
     #[OA\Parameter(
         name: 'id_structure',
         in: 'query',
@@ -57,6 +58,7 @@ class UtilisateurController extends AbstractController
 
     #[Route('/{id}', name: 'api_utilisateurs_show', methods: ['GET'])]
     #[IsGranted('IS_AUTHENTICATED_FULLY')]
+    #[OA\Get(summary: "Détail d'un utilisateur")]
     #[OA\Parameter(
         name: 'id',
         in: 'path',
@@ -84,6 +86,7 @@ class UtilisateurController extends AbstractController
 
     #[Route('', name: 'api_utilisateurs_post', methods: ['POST'])]
     #[IsGranted('ROLE_ADMIN')]
+    #[OA\Post(summary: 'Créer un utilisateur')]
     #[OA\RequestBody(
         description: 'Données requises pour la création d\'un nouvel utilisateur',
         required: true,
@@ -183,6 +186,8 @@ class UtilisateurController extends AbstractController
 
     #[Route('/{id}', name: 'api_utilisateurs_put', methods: ['PUT', 'PATCH'])]
     #[IsGranted('ROLE_ADMIN')]
+    #[OA\Put(summary: 'Modifier un utilisateur')]
+    #[OA\Patch(summary: 'Modifier partiellement un utilisateur')]
     #[OA\Parameter(
         name: 'id',
         in: 'path',
@@ -192,7 +197,7 @@ class UtilisateurController extends AbstractController
     )]
     #[OA\RequestBody(
         description: 'Champs à mettre à jour (partiels acceptés)',
-        required: true,
+        required: false,
         content: new OA\JsonContent(
             properties: [
                 new OA\Property(property: 'email', type: 'string', example: 'nouveau.mail@cocagne.fr'),
@@ -268,6 +273,7 @@ class UtilisateurController extends AbstractController
 
     #[Route('/{id}', name: 'api_utilisateurs_delete', methods: ['DELETE'])]
     #[IsGranted('ROLE_ADMIN')]
+    #[OA\Delete(summary: 'Supprimer un utilisateur')]
     #[OA\Parameter(
         name: 'id',
         in: 'path',

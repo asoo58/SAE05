@@ -20,10 +20,11 @@ use Symfony\Component\Routing\Attribute\Route;
 final class ReglementController extends AbstractController
 {
     #[Route('', name: 'api_reglements_index', methods: ['GET'])]
-    #[OA\Parameter(name: 'id_adherent', in: 'query', description: 'Filtrer par adhérent', required: false, schema: new OA\Schema(type: 'integer'))]
-    #[OA\Parameter(name: 'statut', in: 'query', description: 'Filtrer par statut', required: false, schema: new OA\Schema(type: 'string'))]
-    #[OA\Parameter(name: 'mode_reglement', in: 'query', description: 'Filtrer par mode de règlement', required: false, schema: new OA\Schema(type: 'string'))]
-    #[OA\Response(response: 200, description: 'Liste des règlements')]
+    #[OA\Get(summary: 'Liste des règlements')]
+    #[OA\Parameter(name: 'id_adherent', in: 'query', description: 'Filtrer par adhérent', required: false, schema: new OA\Schema(type: 'integer', example: 1))]
+    #[OA\Parameter(name: 'statut', in: 'query', description: 'Filtrer par statut', required: false, schema: new OA\Schema(type: 'string', example: 'valide'))]
+    #[OA\Parameter(name: 'mode_reglement', in: 'query', description: 'Filtrer par mode de règlement', required: false, schema: new OA\Schema(type: 'string', example: 'virement'))]
+    #[OA\Response(response: 200, description: 'Liste des règlements retournée avec succès')]
     public function index(Request $request, ReglementRepository $repository): JsonResponse
     {
         $criteres = [];
@@ -47,7 +48,9 @@ final class ReglementController extends AbstractController
     }
 
     #[Route('/{id}', name: 'api_reglements_show', methods: ['GET'])]
-    #[OA\Response(response: 200, description: 'Détail d\'un règlement')]
+    #[OA\Get(summary: 'Détail d\'un règlement')]
+    #[OA\Parameter(name: 'id', in: 'path', description: 'Identifiant unique du règlement', required: true, schema: new OA\Schema(type: 'integer', example: 1))]
+    #[OA\Response(response: 200, description: 'Détail du règlement retourné avec succès')]
     #[OA\Response(response: 404, description: 'Règlement introuvable')]
     public function show(int $id, ReglementRepository $repository): JsonResponse
     {
@@ -61,7 +64,9 @@ final class ReglementController extends AbstractController
     }
 
     #[Route('', name: 'api_reglements_create', methods: ['POST'])]
+    #[OA\Post(summary: 'Créer un règlement')]
     #[OA\RequestBody(
+        description: 'Données requises pour enregistrer un règlement',
         required: true,
         content: new OA\JsonContent(
             required: ['date_reglement', 'montant', 'mode_reglement', 'id_adherent'],
@@ -152,8 +157,12 @@ final class ReglementController extends AbstractController
     }
 
     #[Route('/{id}', name: 'api_reglements_update', methods: ['PUT', 'PATCH'])]
+    #[OA\Put(summary: 'Modifier un règlement')]
+    #[OA\Patch(summary: 'Modifier partiellement un règlement')]
+    #[OA\Parameter(name: 'id', in: 'path', description: 'Identifiant unique du règlement à modifier', required: true, schema: new OA\Schema(type: 'integer', example: 1))]
     #[OA\RequestBody(
-        required: true,
+        description: 'Champs du règlement à mettre à jour',
+        required: false,
         content: new OA\JsonContent(
             properties: [
                 new OA\Property(property: 'date_reglement', type: 'string', format: 'date', example: '2026-11-21'),
@@ -165,7 +174,7 @@ final class ReglementController extends AbstractController
             ]
         )
     )]
-    #[OA\Response(response: 200, description: 'Règlement mis à jour')]
+    #[OA\Response(response: 200, description: 'Règlement mis à jour avec succès')]
     #[OA\Response(response: 400, description: 'Données invalides')]
     #[OA\Response(response: 404, description: 'Règlement, abonnement ou adhésion introuvable')]
     public function update(
@@ -239,7 +248,9 @@ final class ReglementController extends AbstractController
     }
 
     #[Route('/{id}', name: 'api_reglements_delete', methods: ['DELETE'])]
-    #[OA\Response(response: 204, description: 'Règlement supprimé')]
+    #[OA\Delete(summary: 'Supprimer un règlement')]
+    #[OA\Parameter(name: 'id', in: 'path', description: 'Identifiant unique du règlement à supprimer', required: true, schema: new OA\Schema(type: 'integer', example: 1))]
+    #[OA\Response(response: 204, description: 'Règlement supprimé avec succès')]
     #[OA\Response(response: 404, description: 'Règlement introuvable')]
     public function delete(
         int $id,

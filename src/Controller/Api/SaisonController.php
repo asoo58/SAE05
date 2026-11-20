@@ -18,8 +18,9 @@ use Symfony\Component\Routing\Attribute\Route;
 final class SaisonController extends AbstractController
 {
     #[Route('', name: 'api_saisons_index', methods: ['GET'])]
-    #[OA\Parameter(name: 'id_structure', in: 'query', description: 'Filtrer par structure', required: false, schema: new OA\Schema(type: 'integer'))]
-    #[OA\Response(response: 200, description: 'Liste des saisons')]
+    #[OA\Get(summary: 'Liste des saisons')]
+    #[OA\Parameter(name: 'id_structure', in: 'query', description: 'Filtrer par identifiant de structure', required: false, schema: new OA\Schema(type: 'integer', example: 1))]
+    #[OA\Response(response: 200, description: 'Liste des saisons retournée avec succès')]
     public function index(Request $request, SaisonRepository $repository): JsonResponse
     {
         $idStructure = $request->query->get('id_structure') ?? $request->query->get('structure_id');
@@ -37,7 +38,9 @@ final class SaisonController extends AbstractController
     }
 
     #[Route('/{id}', name: 'api_saisons_show', methods: ['GET'])]
-    #[OA\Response(response: 200, description: 'Détail d\'une saison')]
+    #[OA\Get(summary: 'Détail d\'une saison')]
+    #[OA\Parameter(name: 'id', in: 'path', description: 'Identifiant unique de la saison', required: true, schema: new OA\Schema(type: 'integer', example: 1))]
+    #[OA\Response(response: 200, description: 'Détail de la saison retourné avec succès')]
     #[OA\Response(response: 404, description: 'Saison introuvable')]
     public function show(int $id, SaisonRepository $repository): JsonResponse
     {
@@ -51,7 +54,9 @@ final class SaisonController extends AbstractController
     }
 
     #[Route('', name: 'api_saisons_create', methods: ['POST'])]
+    #[OA\Post(summary: 'Créer une saison')]
     #[OA\RequestBody(
+        description: 'Données requises pour créer une saison',
         required: true,
         content: new OA\JsonContent(
             required: ['date_debut', 'date_fin', 'id_structure'],
@@ -123,8 +128,12 @@ final class SaisonController extends AbstractController
     }
 
     #[Route('/{id}', name: 'api_saisons_update', methods: ['PUT', 'PATCH'])]
+    #[OA\Put(summary: 'Modifier une saison')]
+    #[OA\Patch(summary: 'Modifier partiellement une saison')]
+    #[OA\Parameter(name: 'id', in: 'path', description: 'Identifiant unique de la saison à modifier', required: true, schema: new OA\Schema(type: 'integer', example: 1))]
     #[OA\RequestBody(
-        required: true,
+        description: 'Champs de la saison à mettre à jour',
+        required: false,
         content: new OA\JsonContent(
             properties: [
                 new OA\Property(property: 'libelle', type: 'string', maxLength: 100, nullable: true, example: 'Saison 2026-2027 Pro'),
@@ -134,7 +143,7 @@ final class SaisonController extends AbstractController
             ]
         )
     )]
-    #[OA\Response(response: 200, description: 'Saison mise à jour')]
+    #[OA\Response(response: 200, description: 'Saison mise à jour avec succès')]
     #[OA\Response(response: 400, description: 'Données invalides')]
     #[OA\Response(response: 404, description: 'Saison ou structure introuvable')]
     public function update(
@@ -196,7 +205,9 @@ final class SaisonController extends AbstractController
     }
 
     #[Route('/{id}', name: 'api_saisons_delete', methods: ['DELETE'])]
-    #[OA\Response(response: 204, description: 'Saison supprimée')]
+    #[OA\Delete(summary: 'Supprimer une saison')]
+    #[OA\Parameter(name: 'id', in: 'path', description: 'Identifiant unique de la saison à supprimer', required: true, schema: new OA\Schema(type: 'integer', example: 1))]
+    #[OA\Response(response: 204, description: 'Saison supprimée avec succès')]
     #[OA\Response(response: 404, description: 'Saison introuvable')]
     public function delete(
         int $id,

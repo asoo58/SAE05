@@ -17,7 +17,8 @@ use Symfony\Component\Routing\Attribute\Route;
 final class StructureController extends AbstractController
 {
     #[Route('', name: 'api_structures_index', methods: ['GET'])]
-    #[OA\Response(response: 200, description: 'Liste des structures')]
+    #[OA\Get(summary: 'Liste des structures')]
+    #[OA\Response(response: 200, description: 'Liste des structures retournée avec succès')]
     public function index(StructureRepository $repository): JsonResponse
     {
         $structures = $repository->findBy([], ['nom_commercial' => 'ASC']);
@@ -26,7 +27,9 @@ final class StructureController extends AbstractController
     }
 
     #[Route('/{id}', name: 'api_structures_show', methods: ['GET'])]
-    #[OA\Response(response: 200, description: 'Détail d\'une structure')]
+    #[OA\Get(summary: 'Détail d\'une structure')]
+    #[OA\Parameter(name: 'id', in: 'path', description: 'Identifiant unique de la structure', required: true, schema: new OA\Schema(type: 'integer', example: 1))]
+    #[OA\Response(response: 200, description: 'Détail de la structure retourné avec succès')]
     #[OA\Response(response: 404, description: 'Structure introuvable')]
     public function show(int $id, StructureRepository $repository): JsonResponse
     {
@@ -40,7 +43,9 @@ final class StructureController extends AbstractController
     }
 
     #[Route('', name: 'api_structures_create', methods: ['POST'])]
+    #[OA\Post(summary: 'Créer une structure')]
     #[OA\RequestBody(
+        description: 'Données requises pour créer une structure',
         required: true,
         content: new OA\JsonContent(
             required: ['nom_commercial', 'raison_social', 'siege_social_adresse'],
@@ -79,10 +84,10 @@ final class StructureController extends AbstractController
             );
         }
 
-        if (!empty($donnees['siret'])) {
-            $siret = trim((string) $donnees['siret']);
-            $siretExistant = $repository->findOneBy(['siret' => $siret]);
-            if ($siretExistant) {
+        $siret = !empty($donnees['siret']) ? trim((string) $donnees['siret']) : null;
+        if ($siret !== null) {
+            $existant = $repository->findOneBy(['siret' => $siret]);
+            if ($existant) {
                 return $this->json(
                     ['error' => 'Une structure avec ce numéro SIRET existe déjà.'],
                     Response::HTTP_CONFLICT
@@ -94,36 +99,34 @@ final class StructureController extends AbstractController
         $structure->setNomCommercial(trim((string) $donnees['nom_commercial']));
         $structure->setRaisonSocial(trim((string) $donnees['raison_social']));
         $structure->setSiegeSocialAdresse(trim((string) $donnees['siege_social_adresse']));
+        $structure->setSiret($siret);
 
-        if (isset($donnees['logo_url'])) {
+        if (array_key_exists('logo_url', $donnees)) {
             $structure->setLogoUrl($donnees['logo_url']);
         }
-        if (isset($donnees['adresse_gestion'])) {
+        if (array_key_exists('adresse_gestion', $donnees)) {
             $structure->setAdresseGestion($donnees['adresse_gestion']);
         }
-        if (isset($donnees['telephone'])) {
+        if (array_key_exists('telephone', $donnees)) {
             $structure->setTelephone($donnees['telephone']);
         }
-        if (isset($donnees['email'])) {
+        if (array_key_exists('email', $donnees)) {
             $structure->setEmail($donnees['email']);
         }
-        if (!empty($donnees['siret'])) {
-            $structure->setSiret(trim((string) $donnees['siret']));
-        }
-        if (isset($donnees['bic'])) {
+        if (array_key_exists('bic', $donnees)) {
             $structure->setBic($donnees['bic']);
         }
-        if (isset($donnees['iban'])) {
+        if (array_key_exists('iban', $donnees)) {
             $structure->setIban($donnees['iban']);
         }
-        if (isset($donnees['ics'])) {
+        if (array_key_exists('ics', $donnees)) {
             $structure->setIcs($donnees['ics']);
         }
-        if (isset($donnees['point_depart_lat'])) {
-            $structure->setPointDepartLat((string) $donnees['point_depart_lat']);
+        if (array_key_exists('point_depart_lat', $donnees)) {
+            $structure->setPointDepartLat($donnees['point_depart_lat'] !== null ? (string) $donnees['point_depart_lat'] : null);
         }
-        if (isset($donnees['point_depart_lng'])) {
-            $structure->setPointDepartLng((string) $donnees['point_depart_lng']);
+        if (array_key_exists('point_depart_lng', $donnees)) {
+            $structure->setPointDepartLng($donnees['point_depart_lng'] !== null ? (string) $donnees['point_depart_lng'] : null);
         }
         if (array_key_exists('assujetti_tva', $donnees)) {
             $structure->setAssujettiTva((bool) $donnees['assujetti_tva']);
@@ -136,8 +139,12 @@ final class StructureController extends AbstractController
     }
 
     #[Route('/{id}', name: 'api_structures_update', methods: ['PUT', 'PATCH'])]
+    #[OA\Put(summary: 'Modifier une structure')]
+    #[OA\Patch(summary: 'Modifier partiellement une structure')]
+    #[OA\Parameter(name: 'id', in: 'path', description: 'Identifiant unique de la structure à modifier', required: true, schema: new OA\Schema(type: 'integer', example: 1))]
     #[OA\RequestBody(
-        required: true,
+        description: 'Champs de la structure à mettre à jour',
+        required: false,
         content: new OA\JsonContent(
             properties: [
                 new OA\Property(property: 'nom_commercial', type: 'string', maxLength: 150, example: 'Cocagne Lorraine'),
@@ -149,7 +156,7 @@ final class StructureController extends AbstractController
             ]
         )
     )]
-    #[OA\Response(response: 200, description: 'Structure mise à jour')]
+    #[OA\Response(response: 200, description: 'Structure mise à jour avec succès')]
     #[OA\Response(response: 400, description: 'Données invalides')]
     #[OA\Response(response: 404, description: 'Structure introuvable')]
     #[OA\Response(response: 409, description: 'Ce numéro SIRET est déjà utilisé')]
@@ -239,7 +246,9 @@ final class StructureController extends AbstractController
     }
 
     #[Route('/{id}', name: 'api_structures_delete', methods: ['DELETE'])]
-    #[OA\Response(response: 204, description: 'Structure supprimée')]
+    #[OA\Delete(summary: 'Supprimer une structure')]
+    #[OA\Parameter(name: 'id', in: 'path', description: 'Identifiant unique de la structure à supprimer', required: true, schema: new OA\Schema(type: 'integer', example: 1))]
+    #[OA\Response(response: 204, description: 'Structure supprimée avec succès')]
     #[OA\Response(response: 404, description: 'Structure introuvable')]
     public function delete(
         int $id,

@@ -15,10 +15,11 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
 #[Route('/api/utilisateur-groupes')]
-#[OA\Tag(name: 'Utilisateurs - Groupes', description: 'Gestion des affectations d\'utilisateurs à des groupes')]
+#[OA\Tag(name: 'Affectations utilisateur-groupe', description: 'Gestion des affectations d\'utilisateurs à des groupes')]
 final class UtilisateurGroupeController extends AbstractController
 {
     #[Route('', name: 'api_utilisateur_groupes_index', methods: ['GET'])]
+    #[OA\Get(summary: 'Liste des affectations utilisateur-groupe')]
     #[OA\Parameter(
         name: 'id_utilisateur',
         in: 'query',
@@ -53,6 +54,7 @@ final class UtilisateurGroupeController extends AbstractController
     }
 
     #[Route('/{utilisateurId}/{groupeId}', name: 'api_utilisateur_groupes_show', methods: ['GET'])]
+    #[OA\Get(summary: 'Détail d\'une affectation utilisateur-groupe')]
     #[OA\Parameter(name: 'utilisateurId', in: 'path', description: 'Identifiant de l\'utilisateur', required: true, schema: new OA\Schema(type: 'integer'))]
     #[OA\Parameter(name: 'groupeId', in: 'path', description: 'Identifiant du groupe', required: true, schema: new OA\Schema(type: 'integer'))]
     #[OA\Response(response: 200, description: 'Détail de l\'affectation utilisateur-groupe')]
@@ -72,6 +74,7 @@ final class UtilisateurGroupeController extends AbstractController
     }
 
     #[Route('', name: 'api_utilisateur_groupes_create', methods: ['POST'])]
+    #[OA\Post(summary: 'Créer une affectation utilisateur-groupe')]
     #[OA\RequestBody(
         required: true,
         content: new OA\JsonContent(
@@ -149,10 +152,12 @@ final class UtilisateurGroupeController extends AbstractController
     }
 
     #[Route('/{utilisateurId}/{groupeId}', name: 'api_utilisateur_groupes_update', methods: ['PUT', 'PATCH'])]
+    #[OA\Put(summary: 'Modifier une affectation utilisateur-groupe')]
+    #[OA\Patch(summary: 'Modifier partiellement une affectation utilisateur-groupe')]
     #[OA\Parameter(name: 'utilisateurId', in: 'path', description: 'Identifiant de l\'utilisateur', required: true, schema: new OA\Schema(type: 'integer'))]
     #[OA\Parameter(name: 'groupeId', in: 'path', description: 'Identifiant du groupe', required: true, schema: new OA\Schema(type: 'integer'))]
     #[OA\RequestBody(
-        required: true,
+        required: false,
         content: new OA\JsonContent(
             properties: [
                 new OA\Property(property: 'date_affectation', type: 'string', format: 'date-time', nullable: true, example: '2026-11-20T12:00:00+01:00'),
@@ -198,6 +203,7 @@ final class UtilisateurGroupeController extends AbstractController
     }
 
     #[Route('/{utilisateurId}/{groupeId}', name: 'api_utilisateur_groupes_delete', methods: ['DELETE'])]
+    #[OA\Delete(summary: 'Supprimer une affectation utilisateur-groupe')]
     #[OA\Parameter(name: 'utilisateurId', in: 'path', description: 'Identifiant de l\'utilisateur', required: true, schema: new OA\Schema(type: 'integer'))]
     #[OA\Parameter(name: 'groupeId', in: 'path', description: 'Identifiant du groupe', required: true, schema: new OA\Schema(type: 'integer'))]
     #[OA\Response(response: 204, description: 'Affectation supprimée')]

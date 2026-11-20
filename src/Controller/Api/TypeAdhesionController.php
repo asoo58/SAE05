@@ -18,6 +18,7 @@ use Symfony\Component\Routing\Attribute\Route;
 final class TypeAdhesionController extends AbstractController
 {
     #[Route('', name: 'api_type_adhesions_index', methods: ['GET'])]
+    #[OA\Get(summary: "Liste des types d'adhésion")]
     #[OA\Parameter(
         name: 'id_structure',
         in: 'query',
@@ -40,6 +41,14 @@ final class TypeAdhesionController extends AbstractController
     }
 
     #[Route('/{id}', name: 'api_type_adhesions_show', methods: ['GET'])]
+    #[OA\Get(summary: "Détail d'un type d'adhésion")]
+    #[OA\Parameter(
+        name: 'id',
+        in: 'path',
+        required: true,
+        description: 'Identifiant unique du type d\'adhésion',
+        schema: new OA\Schema(type: 'integer')
+    )]
     #[OA\Response(response: 200, description: 'Détail d\'un type d\'adhésion')]
     #[OA\Response(response: 404, description: 'Type d\'adhésion introuvable')]
     public function show(int $id, TypeAdhesionRepository $repository): JsonResponse
@@ -54,6 +63,7 @@ final class TypeAdhesionController extends AbstractController
     }
 
     #[Route('', name: 'api_type_adhesions_create', methods: ['POST'])]
+    #[OA\Post(summary: 'Créer un type d\'adhésion')]
     #[OA\RequestBody(
         required: true,
         content: new OA\JsonContent(
@@ -105,8 +115,17 @@ final class TypeAdhesionController extends AbstractController
     }
 
     #[Route('/{id}', name: 'api_type_adhesions_update', methods: ['PUT', 'PATCH'])]
-    #[OA\RequestBody(
+    #[OA\Put(summary: 'Modifier un type d\'adhésion')]
+    #[OA\Patch(summary: 'Modifier partiellement un type d\'adhésion')]
+    #[OA\Parameter(
+        name: 'id',
+        in: 'path',
         required: true,
+        description: 'Identifiant unique du type d\'adhésion',
+        schema: new OA\Schema(type: 'integer')
+    )]
+    #[OA\RequestBody(
+        required: false,
         content: new OA\JsonContent(
             properties: [
                 new OA\Property(property: 'libelle', type: 'string', maxLength: 100, example: 'Adhésion Annuelle Solidaire'),
@@ -161,6 +180,14 @@ final class TypeAdhesionController extends AbstractController
     }
 
     #[Route('/{id}', name: 'api_type_adhesions_delete', methods: ['DELETE'])]
+    #[OA\Delete(summary: 'Supprimer un type d\'adhésion')]
+    #[OA\Parameter(
+        name: 'id',
+        in: 'path',
+        required: true,
+        description: 'Identifiant unique du type d\'adhésion',
+        schema: new OA\Schema(type: 'integer')
+    )]
     #[OA\Response(response: 204, description: 'Type d\'adhésion supprimé')]
     #[OA\Response(response: 404, description: 'Type d\'adhésion introuvable')]
     public function delete(

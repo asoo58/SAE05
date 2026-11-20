@@ -20,6 +20,7 @@ use Symfony\Component\Routing\Attribute\Route;
 final class TourneeController extends AbstractController
 {
     #[Route('', name: 'api_tournees_index', methods: ['GET'])]
+    #[OA\Get(summary: 'Liste des tournées')]
     #[OA\Parameter(
         name: 'id_structure',
         in: 'query',
@@ -64,6 +65,14 @@ final class TourneeController extends AbstractController
     }
 
     #[Route('/{id}', name: 'api_tournees_show', methods: ['GET'])]
+    #[OA\Get(summary: "Détail d'une tournée")]
+    #[OA\Parameter(
+        name: 'id',
+        in: 'path',
+        required: true,
+        description: 'Identifiant unique de la tournée',
+        schema: new OA\Schema(type: 'integer')
+    )]
     #[OA\Response(response: 200, description: 'Détail d\'une tournée')]
     #[OA\Response(response: 404, description: 'Tournée introuvable')]
     public function show(int $id, TourneeRepository $repository): JsonResponse
@@ -78,6 +87,7 @@ final class TourneeController extends AbstractController
     }
 
     #[Route('', name: 'api_tournees_create', methods: ['POST'])]
+    #[OA\Post(summary: 'Créer une tournée')]
     #[OA\RequestBody(
         required: true,
         content: new OA\JsonContent(
@@ -174,8 +184,17 @@ final class TourneeController extends AbstractController
     }
 
     #[Route('/{id}', name: 'api_tournees_update', methods: ['PUT', 'PATCH'])]
-    #[OA\RequestBody(
+    #[OA\Put(summary: 'Modifier une tournée')]
+    #[OA\Patch(summary: 'Modifier partiellement une tournée')]
+    #[OA\Parameter(
+        name: 'id',
+        in: 'path',
         required: true,
+        description: 'Identifiant unique de la tournée',
+        schema: new OA\Schema(type: 'integer')
+    )]
+    #[OA\RequestBody(
+        required: false,
         content: new OA\JsonContent(
             properties: [
                 new OA\Property(property: 'code_tournee', type: 'string', maxLength: 20, example: 'TOUR-NORD-MAJ'),
@@ -292,6 +311,14 @@ final class TourneeController extends AbstractController
     }
 
     #[Route('/{id}', name: 'api_tournees_delete', methods: ['DELETE'])]
+    #[OA\Delete(summary: 'Supprimer une tournée')]
+    #[OA\Parameter(
+        name: 'id',
+        in: 'path',
+        required: true,
+        description: 'Identifiant unique de la tournée',
+        schema: new OA\Schema(type: 'integer')
+    )]
     #[OA\Response(response: 204, description: 'Tournée supprimée')]
     #[OA\Response(response: 404, description: 'Tournée introuvable')]
     public function delete(
