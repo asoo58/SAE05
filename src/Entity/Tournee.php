@@ -5,36 +5,50 @@ namespace App\Entity;
 use App\Repository\TourneeRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: TourneeRepository::class)]
+#[ORM\UniqueConstraint(name: 'uniq_tournee_structure_code', columns: ['id_structure', 'code_tournee'])]
 class Tournee
 {
+    #[Groups(['api_read'])]
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
+    #[Groups(['api_read'])]
     #[ORM\Column(length: 20)]
     private ?string $code_tournee = null;
 
+    #[Groups(['api_read'])]
     #[ORM\Column(length: 100, nullable: true)]
     private ?string $nom = null;
 
+    #[Groups(['api_read'])]
     #[ORM\Column(length: 15, nullable: true)]
     private ?string $jour_preparation = null;
 
+    #[Groups(['api_read'])]
     #[ORM\Column(length: 15, nullable: true)]
     private ?string $jour_livraison = null;
 
+    #[Groups(['api_read'])]
     #[ORM\Column(length: 7, options: ['default' => '#2E7D32'])]
     private ?string $couleur = '#2E7D32';
 
-    #[ORM\ManyToOne(inversedBy: 'tournees')]
+   #[Groups(['api_read'])]
+    #[ORM\ManyToOne(targetEntity: Vehicule::class)]
     private ?Vehicule $vehicule = null;
 
-    #[ORM\ManyToOne(inversedBy: 'tournees')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['api_read'])]
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(name: 'id_structure', nullable: false)]
+    private ?Structure $structure = null;
+
+    #[Groups(['api_read'])]
+    #[ORM\ManyToOne(targetEntity: Saison::class)]
     private ?Saison $saison = null;
 
     /**
@@ -113,29 +127,8 @@ class Tournee
         return $this;
     }
 
-    public function getVehicule(): ?Vehicule
-    {
-        return $this->vehicule;
-    }
-
-    public function setVehicule(?Vehicule $vehicule): static
-    {
-        $this->vehicule = $vehicule;
-
-        return $this;
-    }
-
-    public function getSaison(): ?Saison
-    {
-        return $this->saison;
-    }
-
-    public function setSaison(?Saison $saison): static
-    {
-        $this->saison = $saison;
-
-        return $this;
-    }
+    public function getStructure(): ?Structure { return $this->structure; }
+    public function setStructure(?Structure $structure): static { $this->structure = $structure; return $this; }
 
     /**
      * @return Collection<int, EtapeTournee>
@@ -163,6 +156,30 @@ class Tournee
                 $etapeTournee->setTournee(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getVehicule(): ?Vehicule
+    {
+        return $this->vehicule;
+    }
+
+    public function setVehicule(?Vehicule $vehicule): static
+    {
+        $this->vehicule = $vehicule;
+
+        return $this;
+    }
+
+    public function getSaison(): ?Saison
+    {
+        return $this->saison;
+    }
+
+    public function setSaison(?Saison $saison): static
+    {
+        $this->saison = $saison;
 
         return $this;
     }

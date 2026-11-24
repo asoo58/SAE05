@@ -5,19 +5,21 @@ namespace App\Entity;
 use App\Repository\CalendrierRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: CalendrierRepository::class)]
 class Calendrier
 {
+    #[Groups(['api_read'])]
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
-
+    #[Groups(['api_read'])]
     #[ORM\Column(length: 100, nullable: true)]
     private ?string $nom = null;
-
+    #[Groups(['api_read'])]
     #[ORM\Column(length: 50)]
     private ?string $frequence = null;
 
@@ -27,9 +29,17 @@ class Calendrier
     #[ORM\OneToMany(targetEntity: Abonnement::class, mappedBy: 'calendrier')]
     private Collection $abonnements;
 
+    #[ORM\ManyToOne]
+    private ?Tournee $tournee = null;
+
+    /** @var Collection<int, CalendrierJour> */
+    #[ORM\OneToMany(targetEntity: CalendrierJour::class, mappedBy: 'calendrier', cascade: ['persist'], orphanRemoval: true)]
+    private Collection $jours;
+
     public function __construct()
     {
         $this->abonnements = new ArrayCollection();
+        $this->jours = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -90,4 +100,8 @@ class Calendrier
 
         return $this;
     }
+
+    public function getTournee(): ?Tournee { return $this->tournee; }
+    public function setTournee(?Tournee $tournee): static { $this->tournee = $tournee; return $this; }
+    public function getJours(): Collection { return $this->jours; }
 }

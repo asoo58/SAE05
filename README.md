@@ -70,3 +70,47 @@ docker compose exec php php bin/console doctrine:migrations:migrate --no-interac
 - **Application web :** http://localhost:8090
 - **Documentation API (Swagger) :** http://localhost:8090/api/doc
 - **Gestion BDD (Adminer / pgAdmin) :** http://localhost:8091 ou http://localhost:5050 *(voir ports exacts et identifiants dans le `.env`)*
+
+
+## Utilisation de l'API
+
+L'API est sécurisée par **JWT (JSON Web Token)**.  
+Avant de pouvoir interroger les différentes routes CRUD (`/api/...`), il est nécessaire de générer un token d'authentification.
+
+### 1. Générer un token JWT
+
+#### Option 1 : Avec Postman
+
+Envoyez une requête `POST` sur la route d'authentification :
+
+- **Endpoint :** `POST http://localhost:8090/api/login_check`
+- **En-tête :** `Content-Type: application/json`
+- **Corps de la requête (JSON) :**
+
+```json
+{
+  "username": "prof@cocagne.fr",
+  "password": "test"
+}
+```
+
+#### Option 2 : Directement sur le site
+
+Allez dans la section **Authentification** sur la documentation de l'API et générez un token avec les identifiants ci-dessus.
+
+Dans les deux cas, la réponse renvoie un objet JSON contenant votre `token`.
+
+### 2. S'authentifier sur Swagger
+
+1. Ouvrez la documentation interactive : [http://localhost:8090/documentation-api](http://localhost:8090/documentation-api).
+2. Cliquez sur le bouton **Authorize** (en haut à droite).
+3. Collez le token récupéré à l'étape précédente et validez.
+4. Vous pouvez maintenant tester l'ensemble des routes protégées de l'API directement depuis l'interface.
+
+### 3. Utilisation via un client externe (Postman, Insomnia, cURL)
+
+Pour chaque appel vers une route protégée, ajoutez l'en-tête HTTP suivant :
+
+```http
+Authorization: Bearer <votre_token_jwt>
+```

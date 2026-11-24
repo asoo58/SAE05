@@ -6,36 +6,45 @@ use App\Repository\ProduitRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\UX\Turbo\Attribute\Broadcast;
 
 #[ORM\Entity(repositoryClass: ProduitRepository::class)]
-#[Broadcast]
+
 class Produit
 {
+    #[Groups(['api_read'])]
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column]
+    #[ORM\Column(name: 'id_produit')]
     private ?int $id = null;
 
+    #[Groups(['api_read'])]
     #[ORM\Column(length: 120)]
     private ?string $nom = null;
 
+    #[Groups(['api_read'])]
     #[ORM\Column(length: 30)]
     private ?string $unite = null;
 
+    #[Groups(['api_read'])]
     #[ORM\Column(type: Types::DECIMAL, precision: 8, scale: 2)]
     private ?string $prix = null;
 
+    #[Groups(['api_read'])]
     #[ORM\Column(type: Types::DECIMAL, precision: 5, scale: 2, nullable: true)]
     private ?string $marge = null;
 
+    #[Groups(['api_read'])]
     #[ORM\Column(options: ['default' => 1])]
     private ?int $encombrement_cagettes = 1;
 
+    #[Groups(['api_read'])]
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $photo_url = null;
 
+    #[Groups(['api_read'])]
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $description = null;
 

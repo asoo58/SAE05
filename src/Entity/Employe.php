@@ -5,30 +5,40 @@ namespace App\Entity;
 use App\Repository\EmployeRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: EmployeRepository::class)]
 class Employe
 {
+    #[Groups(['api_read'])]
     #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
-    private ?int $id = null;
+    #[ORM\OneToOne]
+    #[ORM\JoinColumn(name: 'id_employe', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')]
+    private ?Utilisateur $utilisateur = null;
 
+    #[Groups(['api_read'])]
     #[ORM\Column(length: 50, nullable: true)]
     private ?string $poste = null;
 
+    #[Groups(['api_read'])]
     #[ORM\Column(length: 30, nullable: true)]
     private ?string $matricule = null;
 
+    #[Groups(['api_read'])]
     #[ORM\Column(type: Types::DATE_IMMUTABLE, nullable: true)]
     private ?\DateTimeImmutable $dateEmbauche = null;
 
-    #[ORM\Column(nullable: true)]
-    private ?bool $actif = null;
+    #[Groups(['api_read'])]
+    #[ORM\Column(options: ['default' => true])]
+    private bool $actif = true;
 
+    public function getUtilisateur(): ?Utilisateur { return $this->utilisateur; }
+    public function setUtilisateur(?Utilisateur $utilisateur): static { $this->utilisateur = $utilisateur; return $this; }
+
+    #[Groups(['api_read'])]
     public function getId(): ?int
     {
-        return $this->id;
+        return $this->utilisateur?->getId();
     }
 
     public function getPoste(): ?string
@@ -72,7 +82,7 @@ class Employe
         return $this->actif;
     }
 
-    public function setActif(?bool $actif): static
+    public function setActif(bool $actif): static
     {
         $this->actif = $actif;
 

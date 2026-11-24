@@ -15,4 +15,10 @@ final class HomeController extends AbstractController
             'controller_name' => 'HomeController',
         ]);
     }
+
+    #[Route('/documentation-api', name: 'app_api_page')]
+    public function apiPage(): Response
+    {
+        return $this->render('home/api.html.twig');
+    }
 }

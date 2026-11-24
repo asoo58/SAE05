@@ -8,34 +8,37 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\UX\Turbo\Attribute\Broadcast;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: SaisonRepository::class)]
-#[Broadcast]
+
 class Saison
 {
+    #[Groups(['api_read'])]
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
+    #[Groups(['api_read'])]
     #[ORM\Column(length: 100, nullable: true)]
     private ?string $libelle = null;
 
+    #[Groups(['api_read'])]
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     private ?\DateTime $date_debut = null;
 
+    #[Groups(['api_read'])]
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     private ?\DateTime $date_fin = null;
 
-    /**
-     * @var Collection<int, Tournee>
-     */
-    #[ORM\OneToMany(targetEntity: Tournee::class, mappedBy: 'saison')]
-    private Collection $tournees;
+    #[Groups(['api_read'])]
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(name: 'id_structure', nullable: false)]
+    private ?Structure $structure = null;
 
     public function __construct()
     {
-        $this->tournees = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -79,33 +82,6 @@ class Saison
         return $this;
     }
 
-    /**
-     * @return Collection<int, Tournee>
-     */
-    public function getTournees(): Collection
-    {
-        return $this->tournees;
-    }
-
-    public function addTournee(Tournee $tournee): static
-    {
-        if (!$this->tournees->contains($tournee)) {
-            $this->tournees->add($tournee);
-            $tournee->setSaison($this);
-        }
-
-        return $this;
-    }
-
-    public function removeTournee(Tournee $tournee): static
-    {
-        if ($this->tournees->removeElement($tournee)) {
-            // set the owning side to null (unless already changed)
-            if ($tournee->getSaison() === $this) {
-                $tournee->setSaison(null);
-            }
-        }
-
-        return $this;
-    }
+    public function getStructure(): ?Structure { return $this->structure; }
+    public function setStructure(?Structure $structure): static { $this->structure = $structure; return $this; }
 }

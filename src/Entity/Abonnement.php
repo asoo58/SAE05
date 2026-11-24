@@ -7,24 +7,30 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: AbonnementRepository::class)]
 class Abonnement
 {
+    #[Groups(['api_read'])]
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
+    #[Groups(['api_read'])]
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     private ?\DateTime $date_debut = null;
 
+    #[Groups(['api_read'])]
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     private ?\DateTime $date_fin = null;
 
+    #[Groups(['api_read'])]
     #[ORM\Column(type: Types::DECIMAL, precision: 5, scale: 2, options: ['default' => '0'])]
-    private ?string $remise_pourcentage = '0';
+    private ?string $remisePourcentage = '0';
 
+    #[Groups(['api_read'])]
     #[ORM\Column(length: 20, options: ['default' => 'actif'])]
     private ?string $statut = 'actif';
 
@@ -34,17 +40,24 @@ class Abonnement
     #[ORM\OneToMany(targetEntity: Reglement::class, mappedBy: 'abonnement')]
     private Collection $reglements;
 
+    #[Groups(['api_read'])]
     #[ORM\ManyToOne(inversedBy: 'abonnements')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: false, referencedColumnName: 'id_adherent')]
     private ?Adherent $adherent = null;
 
+    #[Groups(['api_read'])]
     #[ORM\ManyToOne(inversedBy: 'abonnements')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: false, referencedColumnName: 'id_produit')]
     private ?Produit $produit = null;
 
+    #[Groups(['api_read'])]
     #[ORM\ManyToOne(inversedBy: 'abonnements')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Calendrier $calendrier = null;
+
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(name: 'id_depot', referencedColumnName: 'id_depot', nullable: true)]
+    private ?Depot $depot = null;
 
     public function __construct()
     {
@@ -64,7 +77,6 @@ class Abonnement
     public function setDateDebut(\DateTime $date_debut): static
     {
         $this->date_debut = $date_debut;
-
         return $this;
     }
 
@@ -76,19 +88,17 @@ class Abonnement
     public function setDateFin(\DateTime $date_fin): static
     {
         $this->date_fin = $date_fin;
-
         return $this;
     }
 
     public function getRemisePourcentage(): ?string
     {
-        return $this->remise_pourcentage;
+        return $this->remisePourcentage;
     }
 
-    public function setRemisePourcentage(string $remise_pourcentage): static
+    public function setRemisePourcentage(string $remisePourcentage): static
     {
-        $this->remise_pourcentage = $remise_pourcentage;
-
+        $this->remisePourcentage = $remisePourcentage;
         return $this;
     }
 
@@ -100,7 +110,6 @@ class Abonnement
     public function setStatut(string $statut): static
     {
         $this->statut = $statut;
-
         return $this;
     }
 
@@ -118,19 +127,16 @@ class Abonnement
             $this->reglements->add($reglement);
             $reglement->setAbonnement($this);
         }
-
         return $this;
     }
 
     public function removeReglement(Reglement $reglement): static
     {
         if ($this->reglements->removeElement($reglement)) {
-            // set the owning side to null (unless already changed)
             if ($reglement->getAbonnement() === $this) {
                 $reglement->setAbonnement(null);
             }
         }
-
         return $this;
     }
 
@@ -142,7 +148,6 @@ class Abonnement
     public function setAdherent(?Adherent $adherent): static
     {
         $this->adherent = $adherent;
-
         return $this;
     }
 
@@ -154,7 +159,6 @@ class Abonnement
     public function setProduit(?Produit $produit): static
     {
         $this->produit = $produit;
-
         return $this;
     }
 
@@ -166,7 +170,9 @@ class Abonnement
     public function setCalendrier(?Calendrier $calendrier): static
     {
         $this->calendrier = $calendrier;
-
         return $this;
     }
+
+    public function getDepot(): ?Depot { return $this->depot; }
+    public function setDepot(?Depot $depot): static { $this->depot = $depot; return $this; }
 }

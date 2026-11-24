@@ -7,53 +7,69 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
+
 use Symfony\UX\Turbo\Attribute\Broadcast;
 
 #[ORM\Entity(repositoryClass: DepotRepository::class)]
-#[Broadcast]
+
 class Depot
 {
+    #[Groups(['api_read'])]
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column]
+    #[ORM\Column(name: 'id_depot')]
     private ?int $id = null;
 
+    #[Groups(['api_read'])]
     #[ORM\Column(length: 120)]
     private ?string $nom = null;
 
+    #[Groups(['api_read'])]
     #[ORM\Column]
     private ?int $categorie = null;
 
+    #[Groups(['api_read'])]
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $texte_reserve = null;
 
+    #[Groups(['api_read'])]
     #[ORM\Column(length: 100, nullable: true)]
     private ?string $mot_de_passe_depot = null;
 
+    #[Groups(['api_read'])]
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 7, nullable: false)]
     private ?string $latitude;
 
+    #[Groups(['api_read'])]
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 7)]
     private ?string $longitude = null;
 
+    #[Groups(['api_read'])]
     #[ORM\Column(length: 255)]
     private ?string $adresse = null;
 
+    #[Groups(['api_read'])]
     #[ORM\Column(length: 10)]
     private ?string $code_postal = null;
 
-    #[ORM\Column(length: 150)]
+    #[Groups(['api_read'])]
+    #[ORM\Column(length: 100)]
     private ?string $ville = null;
 
+    #[Groups(['api_read'])]
     #[ORM\Column]
     private ?int $capacite_max_paniers = null;
 
-    #[ORM\Column(length: 100)]
+    #[Groups(['api_read'])]
+    #[ORM\Column(length: 100, nullable: true)]
     private ?string $referent_nom = null;
 
-    #[ORM\Column(length: 20)]
+    #[Groups(['api_read'])]
+    #[ORM\Column(length: 20, nullable: true)]
     private ?string $referent_tel = null;
 
+    #[Groups(['api_read'])]
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $creneaux_recuperation = null;
 
@@ -214,7 +230,7 @@ class Depot
         return $this->referent_tel;
     }
 
-    public function setReferentTel(string $referent_tel): static
+    public function setReferentTel(?string $referent_tel): static
     {
         $this->referent_tel = $referent_tel;
 
