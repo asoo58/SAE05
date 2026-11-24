@@ -16,6 +16,33 @@ class PanierLivraisonRepository extends ServiceEntityRepository
         parent::__construct($registry, PanierLivraison::class);
     }
 
+    public function countPaniersAPreparerPourDepot(\App\Entity\Depot $depot): int
+    {
+        return (int) $this->createQueryBuilder('p')
+            ->select('COUNT(p.id)')
+            ->andWhere('p.depot = :depot')
+            ->andWhere('p.livraisonTournee IS NULL')
+            ->andWhere('p.statut = :statut')
+            ->setParameter('depot', $depot)
+            ->setParameter('statut', 'a_preparer')
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    /** @return PanierLivraison[] */
+    public function findPaniersAPreparerPourDepot(\App\Entity\Depot $depot): array
+    {
+        return $this->createQueryBuilder('p')
+            ->andWhere('p.depot = :depot')
+            ->andWhere('p.livraisonTournee IS NULL')
+            ->andWhere('p.statut = :statut')
+            ->setParameter('depot', $depot)
+            ->setParameter('statut', 'a_preparer')
+            ->orderBy('p.id', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
 //    /**
 //     * @return PanierLivraison[] Returns an array of PanierLivraison objects
 //     */

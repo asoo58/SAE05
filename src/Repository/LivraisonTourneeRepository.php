@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\LivraisonTournee;
+use App\Entity\Structure;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -14,6 +15,37 @@ class LivraisonTourneeRepository extends ServiceEntityRepository
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, LivraisonTournee::class);
+    }
+
+    /**
+     * Livraisons (une par tournée) avec tournée, véhicule, chauffeur et étapes.
+     *
+     * @return LivraisonTournee[]
+     */
+    public function findPourListe(?Structure $structure = null, ?\DateTimeInterface $date = null): array
+    {
+        $qb = $this->createQueryBuilder('l')
+            ->addSelect('t', 'v', 'c', 'e', 'et', 'd')
+            ->join('l.tournee', 't')
+            ->leftJoin('l.vehicule', 'v')
+            ->leftJoin('l.chauffeur', 'c')
+            ->leftJoin('c.employe', 'e')
+            ->leftJoin('t.etapeTournees', 'et')
+            ->leftJoin('et.depot', 'd')
+            ->orderBy('l.date_livraison', 'DESC')
+            ->addOrderBy('t.id', 'DESC');
+
+        if ($structure !== null) {
+            $qb->andWhere('t.structure = :structure')
+                ->setParameter('structure', $structure);
+        }
+
+        if ($date !== null) {
+            $qb->andWhere('l.date_livraison = :date')
+                ->setParameter('date', $date->format('Y-m-d'));
+        }
+
+        return $qb->getQuery()->getResult();
     }
 
 //    /**
