@@ -1,0 +1,1150 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Organisation des tournées{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ asset('css/tournees.css') }}">
+{% endblock %}
+
+{% block body %}
+    <div class="tournees-page tournees-page--organisation" id="tournees-app"
+         data-plan-url="{{ path('app_tournees_plan') }}"
+         data-creer-url="{{ path('app_tournees_creer') }}"
+         data-plan-cible-url="{{ path('app_tournees_plan_cible') }}"
+         data-creer-cible-url="{{ path('app_tournees_creer_cible') }}"
+         data-liste-url="{{ path('app_tournees_liste') }}">
+
+        <section class="tournees-hero rounded-4 p-4 p-lg-5 mb-4">
+            <div class="d-flex align-items-start gap-3 position-relative" style="z-index: 1;">
+                <span class="hero-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M1 3h15v13H1z"></path>
+                        <path d="M16 8h4l3 3v5h-7V8z"></path>
+                        <circle cx="5.5" cy="18.5" r="2.5"></circle>
+                        <circle cx="18.5" cy="18.5" r="2.5"></circle>
+                    </svg>
+                </span>
+                <div>
+                    <span class="badge rounded-pill bg-white text-success mb-2">Organisation</span>
+                    <h1 class="h3 mb-2">Organiser les tournées de livraison</h1>
+                    <p class="mb-0 text-white-50" style="max-width: 640px;">
+                        Répartissez les paniers sur les camionnettes selon leur capacité, vérifiez le plan,
+                        puis affectez un chauffeur à chaque véhicule pour créer les tournées.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        {% include 'tournees/_tabs.html.twig' with { current: 'organiser' } %}
+
+        <div class="btn-group mb-4" role="group" aria-label="Mode d'organisation">
+            <button type="button" class="btn btn-outline-success active" id="mode-auto">
+                Plan automatique
+            </button>
+            <button type="button" class="btn btn-outline-success" id="mode-cible">
+                Demande ciblée
+            </button>
+        </div>
+
+        <div id="tournees-status" class="mb-3" role="status" aria-live="polite"></div>
+
+        <div id="panel-auto">
+        <ol class="tournees-stepper mb-4" id="tournees-stepper">
+            <li class="is-active" data-step="1">Structure et date</li>
+            <li data-step="2">Vérification du plan</li>
+            <li data-step="3">Affectation des chauffeurs</li>
+            <li data-step="4">Création des tournées</li>
+        </ol>
+
+        <div class="row g-4 mb-4">
+            <div class="col-lg-7">
+                <div class="card tc-card h-100">
+                    <div class="card-body p-4 p-lg-5">
+                        <h2 class="section-title mb-4"><span class="dot"></span>Paramètres</h2>
+
+                        <form id="tournees-form">
+                            <div class="row g-3">
+                                <div class="col-md-7">
+                                    <label for="structure-id" class="form-label fw-semibold">Structure</label>
+                                    {% if structures is empty %}
+                                        <div class="alert alert-warning mb-0 small">
+                                            Aucune structure enregistrée. Créez d’abord une structure avec ses dépôts,
+                                            ses véhicules et ses paniers.
+                                        </div>
+                                    {% else %}
+                                        <select id="structure-id" name="structure" class="form-select" required>
+                                            {% for structure in structures %}
+                                                <option value="{{ structure.id }}">
+                                                    {{ structure.nomCommercial ?? 'Structure sans nom' }}
+                                                </option>
+                                            {% endfor %}
+                                        </select>
+                                        <div class="form-text">La structure détermine les dépôts, véhicules et paniers utilisés.</div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="col-md-5">
+                                    <label for="date-livraison" class="form-label fw-semibold">Date de livraison</label>
+                                    <input id="date-livraison" name="date" type="date" class="form-control"
+                                           value="{{ 'now'|date('Y-m-d') }}" required>
+                                    <div class="form-text">Date portée par les tournées créées.</div>
+                                </div>
+
+                                <div class="col-12 pt-2">
+                                    <button id="btn-plan" type="submit" class="btn btn-tc btn-lg w-100"
+                                            {% if structures is empty %}disabled{% endif %}>
+                                        <span id="plan-spinner" class="spinner-border spinner-border-sm me-2 d-none" role="status" aria-hidden="true"></span>
+                                        <span id="plan-label">Calculer le plan</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-5">
+                <div class="card tc-card h-100">
+                    <div class="card-body p-4 p-lg-5">
+                        <h2 class="section-title mb-3"><span class="dot"></span>Règles de calcul</h2>
+                        <ul class="list-unstyled small mb-3">
+                            <li class="d-flex gap-2 mb-2">
+                                <span class="text-success">✓</span>
+                                <span>Chaque dépôt est limité par sa <strong>capacité maximale de paniers</strong>.</span>
+                            </li>
+                            <li class="d-flex gap-2 mb-2">
+                                <span class="text-success">✓</span>
+                                <span>Seules les camionnettes <strong>actives</strong> et de capacité positive sont utilisées.</span>
+                            </li>
+                            <li class="d-flex gap-2 mb-2">
+                                <span class="text-success">✓</span>
+                                <span>Les paniers sont répartis pour <strong>remplir au mieux</strong> les véhicules.</span>
+                            </li>
+                            <li class="d-flex gap-2">
+                                <span class="text-success">✓</span>
+                                <span>Les dépôts d’une tournée sont ordonnés par <strong>distance</strong> depuis le point de départ.</span>
+                            </li>
+                        </ul>
+                        <div class="alert alert-warning border-0 rounded-4 mb-0 small">
+                            <strong>Le calcul du plan ne modifie rien.</strong> La création réelle n’a lieu qu’après
+                            validation des chauffeurs.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <section id="plan-section" class="d-none fade-in">
+            <div class="card tc-card mb-4">
+                <div class="card-body p-4 p-lg-5">
+                    <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">
+                        <div>
+                            <h2 class="section-title mb-1"><span class="dot"></span>Plan proposé</h2>
+                            <p class="text-muted small mb-0" id="plan-subtitle"></p>
+                        </div>
+                        <span class="badge badge-soft rounded-pill px-3 py-2" id="plan-date-badge"></span>
+                    </div>
+
+                    <div class="row g-3 mb-4" id="kpi-row"></div>
+
+                    <h3 class="h6 fw-bold mb-3">Paniers à livrer par dépôt</h3>
+                    <div class="table-responsive mb-2">
+                        <table class="table table-depots align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Dépôt</th>
+                                    <th>Ville</th>
+                                    <th class="text-end">Paniers</th>
+                                    <th class="text-end">Capacité</th>
+                                    <th style="width: 160px;">Utilisation</th>
+                                </tr>
+                            </thead>
+                            <tbody id="depots-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-3">
+                <h2 class="section-title mb-0"><span class="dot"></span>Camionnettes et chauffeurs</h2>
+                <span class="badge text-bg-light" id="drivers-count">0 / 0 chauffeur affecté</span>
+            </div>
+
+            <div class="row g-3 mb-4" id="vehicles-row"></div>
+
+            <div class="card tc-card">
+                <div class="card-body p-3 p-lg-4 d-flex flex-wrap justify-content-between align-items-center gap-3">
+                    <div class="small text-muted">
+                        <strong class="text-dark">Création réelle.</strong>
+                        Les tournées, étapes et livraisons seront enregistrées et les paniers affectés.
+                    </div>
+                    <button id="btn-creer" type="button" class="btn btn-tc btn-lg">
+                        <span id="creer-spinner" class="spinner-border spinner-border-sm me-2 d-none" role="status" aria-hidden="true"></span>
+                        <span id="creer-label">Créer les tournées</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <section id="empty-plan" class="d-none">
+            <div class="card tc-card">
+                <div class="card-body p-4 p-lg-5 text-center">
+                    <span class="empty-illustration mb-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M21 8v13H3V8"></path>
+                            <path d="M1 3h22v5H1z"></path>
+                            <path d="M10 12h4"></path>
+                        </svg>
+                    </span>
+                    <h2 class="h5 mb-2">Aucun panier à livrer</h2>
+                    <p class="text-muted mb-0">
+                        Cette structure n’a aucun panier en attente de livraison pour le moment.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section id="result-section" class="d-none mt-4">
+            <h2 class="section-title mb-3"><span class="dot"></span>Tournées créées</h2>
+            <div class="row g-3" id="result-row"></div>
+        </section>
+
+        <details class="mt-4">
+            <summary class="text-muted small">Voir les données techniques</summary>
+            <pre id="tournees-json" class="mt-2 p-3 bg-light border rounded small text-wrap"></pre>
+        </details>
+        </div>
+
+        <div id="panel-cible" class="d-none">
+            <div class="card tc-card mb-4">
+                <div class="card-body p-4 p-lg-5">
+                    <h2 class="section-title mb-3"><span class="dot"></span>Demande ciblée</h2>
+                    <p class="text-muted small mb-4">
+                        Choisissez vous-même les dépôts et le nombre de paniers à livrer à chacun.
+                        L’application vérifie le stock, ordonne les arrêts et répartit sur les camionnettes disponibles.
+                    </p>
+
+                    {% set depots_json = depots_par_structure|default({})|json_encode(constant('JSON_UNESCAPED_UNICODE')) %}
+                    <div id="depots-par-structure" class="d-none">{{ depots_json }}</div>
+
+                    <form id="cible-form">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="cible-structure-id" class="form-label fw-semibold">Structure</label>
+                                <select id="cible-structure-id" class="form-select" {% if structures is empty %}disabled{% endif %}>
+                                    {% for structure in structures %}
+                                        <option value="{{ structure.id }}">{{ structure.nomCommercial ?? 'Structure sans nom' }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="cible-date-livraison" class="form-label fw-semibold">Date de livraison</label>
+                                <input id="cible-date-livraison" type="date" class="form-control" value="{{ 'now'|date('Y-m-d') }}" required>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center mt-4 mb-2">
+                            <h3 class="h6 fw-bold mb-0">Dépôts et quantités</h3>
+                            <button type="button" class="btn btn-sm btn-outline-success" id="btn-add-ligne"
+                                    {% if structures is empty %}disabled{% endif %}>
+                                + Ajouter un dépôt
+                            </button>
+                        </div>
+
+                        <div id="cible-lignes"></div>
+                        <p id="cible-aucune-ligne" class="text-muted small mb-3">Aucun dépôt ajouté.</p>
+
+                        <div id="cible-resume" class="alert alert-light border small mb-3 d-none"></div>
+
+                        <button id="btn-plan-cible" type="submit" class="btn btn-tc btn-lg w-100"
+                                {% if structures is empty %}disabled{% endif %}>
+                            <span id="plan-cible-spinner" class="spinner-border spinner-border-sm me-2 d-none" role="status" aria-hidden="true"></span>
+                            <span id="plan-cible-label">Vérifier la demande</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <section id="cible-plan-section" class="d-none fade-in">
+                <div class="card tc-card mb-4">
+                    <div class="card-body p-4 p-lg-5">
+                        <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">
+                            <div>
+                                <h2 class="section-title mb-1"><span class="dot"></span>Plan ciblé proposé</h2>
+                                <p class="text-muted small mb-0" id="cible-plan-subtitle"></p>
+                            </div>
+                            <span class="badge badge-soft rounded-pill px-3 py-2" id="cible-plan-date-badge"></span>
+                        </div>
+                        <div class="row g-3 mb-4" id="cible-kpi-row"></div>
+                        <h3 class="h6 fw-bold mb-3">Détail de la demande</h3>
+                        <div class="table-responsive mb-2">
+                            <table class="table table-depots align-middle mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Dépôt</th>
+                                        <th>Ville</th>
+                                        <th class="text-end">Demandé</th>
+                                        <th class="text-end">Disponible</th>
+                                        <th class="text-end">Capacité</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="cible-lignes-body"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-3">
+                    <h2 class="section-title mb-0"><span class="dot"></span>Camionnettes et chauffeurs</h2>
+                    <span class="badge text-bg-light" id="cible-drivers-count">0 / 0 chauffeur affecté</span>
+                </div>
+                <div class="row g-3 mb-4" id="cible-vehicles-row"></div>
+
+                <div class="card tc-card">
+                    <div class="card-body p-3 p-lg-4 d-flex flex-wrap justify-content-between align-items-center gap-3">
+                        <div class="small text-muted">
+                            <strong class="text-dark">Création réelle.</strong>
+                            Seuls les paniers des dépôts choisis seront affectés.
+                        </div>
+                        <button id="btn-creer-cible" type="button" class="btn btn-tc btn-lg">
+                            <span id="creer-cible-spinner" class="spinner-border spinner-border-sm me-2 d-none" role="status" aria-hidden="true"></span>
+                            <span id="creer-cible-label">Créer la tournée ciblée</span>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <section id="cible-result-section" class="d-none mt-4">
+                <h2 class="section-title mb-3"><span class="dot"></span>Tournées créées</h2>
+                <div class="row g-3" id="cible-result-row"></div>
+            </section>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+        const app = document.getElementById('tournees-app');
+        const planUrl = app.dataset.planUrl;
+        const creerUrl = app.dataset.creerUrl;
+        const planCibleUrl = app.dataset.planCibleUrl;
+        const creerCibleUrl = app.dataset.creerCibleUrl;
+        const listeUrl = app.dataset.listeUrl;
+
+        const chauffeurs = {{ chauffeurs_json|json_encode|raw }};
+        const chauffeurById = new Map(chauffeurs.map((chauffeur) => [Number(chauffeur.id), chauffeur]));
+
+        const form = document.getElementById('tournees-form');
+        const structureSelect = document.getElementById('structure-id');
+        const dateInput = document.getElementById('date-livraison');
+        const planButton = document.getElementById('btn-plan');
+        const planLabel = document.getElementById('plan-label');
+        const planSpinner = document.getElementById('plan-spinner');
+        const creerButton = document.getElementById('btn-creer');
+        const creerLabel = document.getElementById('creer-label');
+        const creerSpinner = document.getElementById('creer-spinner');
+        const statusBox = document.getElementById('tournees-status');
+        const planSection = document.getElementById('plan-section');
+        const emptyPlan = document.getElementById('empty-plan');
+        const resultSection = document.getElementById('result-section');
+        const resultRow = document.getElementById('result-row');
+        const jsonBox = document.getElementById('tournees-json');
+        const kpiRow = document.getElementById('kpi-row');
+        const depotsBody = document.getElementById('depots-body');
+        const vehiclesRow = document.getElementById('vehicles-row');
+        const driversCount = document.getElementById('drivers-count');
+        const planSubtitle = document.getElementById('plan-subtitle');
+        const planDateBadge = document.getElementById('plan-date-badge');
+        const stepper = document.getElementById('tournees-stepper');
+
+        // Nombre de paniers par dépôt tel qu'affiché : envoyé à la création
+        // pour détecter qu'un autre utilisateur a organisé entre-temps.
+        let dernierPlan = null;
+        let recalculApresConflit = false;
+        let enAttenteRecalcul = false;
+
+        const numberFormat = new Intl.NumberFormat('fr-FR');
+        const dateFormat = new Intl.DateTimeFormat('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' });
+
+        const escapeHtml = (value) => {
+            const element = document.createElement('div');
+            element.textContent = value ?? '';
+            return element.innerHTML;
+        };
+
+        const formatDate = (value) => {
+            const date = new Date(`${value}T00:00:00`);
+            return Number.isNaN(date.getTime()) ? value : dateFormat.format(date);
+        };
+
+        const setStep = (step) => {
+            stepper.querySelectorAll('li').forEach((item) => {
+                item.classList.toggle('is-active', Number(item.dataset.step) <= step);
+            });
+        };
+
+        const showAlert = (type, html) => {
+            statusBox.innerHTML = `<div class="alert alert-${type} border-0 rounded-4 shadow-sm mb-0">${html}</div>`;
+        };
+
+        const clearAlert = () => {
+            statusBox.innerHTML = '';
+        };
+
+        const chauffeurLabel = (id) => {
+            const chauffeur = chauffeurById.get(Number(id));
+            return chauffeur ? chauffeur.nom : `Chauffeur #${id}`;
+        };
+
+        const setBusy = (button, spinner, label, busy, busyText, idleText) => {
+            button.disabled = busy;
+            spinner.classList.toggle('d-none', !busy);
+            label.textContent = busy ? busyText : idleText;
+        };
+
+        const renderKpis = (data) => {
+            const cards = [
+                {
+                    label: 'Paniers à livrer',
+                    value: numberFormat.format(data.paniers_total),
+                    sub: `${data.paniers_par_depot.length} dépôt${data.paniers_par_depot.length > 1 ? 's' : ''} concerné${data.paniers_par_depot.length > 1 ? 's' : ''}`,
+                },
+                {
+                    label: 'Camionnettes utilisées',
+                    value: numberFormat.format(data.vehicules_total),
+                    sub: `${numberFormat.format(data.capacite_totale)} paniers de capacité`,
+                },
+                {
+                    label: 'Taux de remplissage',
+                    value: `${data.taux_remplissage} %`,
+                    sub: `${numberFormat.format(data.charge_totale)} paniers chargés`,
+                },
+            ];
+
+            kpiRow.innerHTML = cards.map((card) => `
+                <div class="col-md-4">
+                    <div class="kpi">
+                        <div class="tc-label mb-2">${escapeHtml(card.label)}</div>
+                        <div class="kpi-value">${escapeHtml(card.value)}</div>
+                        <div class="kpi-sub">${escapeHtml(card.sub)}</div>
+                    </div>
+                </div>
+            `).join('');
+        };
+
+        const renderDepots = (depots) => {
+            depotsBody.innerHTML = depots.map((depot) => {
+                const taux = depot.taux;
+                const barClass = taux === null ? 'bg-secondary' : (taux >= 90 ? 'bg-danger' : (taux >= 70 ? 'bg-warning' : 'bg-success'));
+
+                return `
+                    <tr>
+                        <td class="fw-semibold">${escapeHtml(depot.nom)}</td>
+                        <td class="text-muted small">${escapeHtml(depot.ville ?? '—')}</td>
+                        <td class="text-end fw-semibold">${numberFormat.format(depot.paniers)}</td>
+                        <td class="text-end text-muted">${depot.capacite_max === null ? '—' : numberFormat.format(depot.capacite_max)}</td>
+                        <td>
+                            ${taux === null ? '<span class="text-muted small">—</span>' : `
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="progress progress-thin flex-grow-1">
+                                        <div class="progress-bar ${barClass}" style="width: ${Math.min(100, taux)}%"></div>
+                                    </div>
+                                    <span class="small text-muted">${taux} %</span>
+                                </div>
+                            `}
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        };
+
+        const renderVehicles = (vehicules) => {
+            vehiclesRow.innerHTML = vehicules.map((vehicule) => {
+                const barClass = vehicule.taux >= 90 ? 'bg-success' : (vehicule.taux >= 50 ? 'bg-success' : 'bg-warning');
+                const etapes = vehicule.etapes.map((etape) => `
+                    <div class="step-line">
+                        <span class="step-index">${etape.ordre}</span>
+                        <div class="flex-grow-1">
+                            <div class="fw-semibold small">${escapeHtml(etape.nom)}</div>
+                            <div class="text-muted small">${escapeHtml(etape.ville ?? '')}</div>
+                        </div>
+                        <span class="badge badge-soft align-self-center">${numberFormat.format(etape.quantite)} paniers</span>
+                    </div>
+                `).join('');
+
+                return `
+                    <div class="col-xl-6">
+                        <div class="vehicle-card p-4">
+                            <div class="d-flex justify-content-between align-items-start gap-3 mb-3">
+                                <div>
+                                    <span class="vehicle-plate">${escapeHtml(vehicule.immatriculation)}</span>
+                                    <div class="text-muted small mt-2">${escapeHtml(vehicule.modele ?? 'Modèle non renseigné')}</div>
+                                </div>
+                                <span class="badge ${vehicule.reste === 0 ? 'text-bg-success' : 'text-bg-light'}">
+                                    ${vehicule.reste === 0 ? 'Plein' : `${numberFormat.format(vehicule.reste)} panier(s) libre(s)`}
+                                </span>
+                            </div>
+
+                            <div class="d-flex justify-content-between small mb-1">
+                                <span class="text-muted">Chargement</span>
+                                <span class="fw-semibold">${numberFormat.format(vehicule.charge)} / ${numberFormat.format(vehicule.capacite)} paniers</span>
+                            </div>
+                            <div class="progress progress-thin mb-4">
+                                <div class="progress-bar ${barClass}" style="width: ${Math.min(100, vehicule.taux)}%"></div>
+                            </div>
+
+                            <div class="tc-label mb-2">Chauffeur</div>
+                            <select class="form-select driver-select mb-3" data-vehicule-id="${vehicule.vehicule_id}">
+                                <option value="">Choisir un chauffeur…</option>
+                                ${chauffeurs.map((chauffeur) => `
+                                    <option value="${chauffeur.id}">${escapeHtml(chauffeur.nom)}${chauffeur.permis ? ` — permis ${escapeHtml(chauffeur.permis)}` : ''}</option>
+                                `).join('')}
+                            </select>
+
+                            <div class="tc-label mb-1">Itinéraire (${vehicule.etapes.length} étape${vehicule.etapes.length > 1 ? 's' : ''})</div>
+                            ${etapes}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            vehiclesRow.querySelectorAll('.driver-select').forEach((select) => {
+                select.addEventListener('change', () => {
+                    refreshDriverChoices();
+                    select.classList.remove('is-missing');
+                });
+            });
+
+            refreshDriverChoices();
+        };
+
+        const refreshDriverChoices = () => {
+            const selects = Array.from(vehiclesRow.querySelectorAll('.driver-select'));
+            const selected = new Set(
+                selects.map((select) => select.value).filter((value) => value !== '')
+            );
+
+            selects.forEach((select) => {
+                Array.from(select.options).forEach((option) => {
+                    if (option.value === '') {
+                        return;
+                    }
+                    option.disabled = option.value !== select.value && selected.has(option.value);
+                });
+            });
+
+            const filled = selects.filter((select) => select.value !== '').length;
+            driversCount.textContent = `${filled} / ${selects.length} chauffeur${selects.length > 1 ? 's' : ''} affecté${filled > 1 ? 's' : ''}`;
+            creerButton.disabled = filled !== selects.length || selects.length === 0;
+            setStep(filled === selects.length && selects.length > 0 ? 3 : 2);
+        };
+
+        const lireReponse = async (response) => {
+            const texte = await response.text();
+            try {
+                return { data: texte === '' ? {} : JSON.parse(texte), ok: response.ok, status: response.status };
+            } catch {
+                return { data: { message: texte || `Erreur HTTP ${response.status}.` }, ok: false, status: response.status };
+            }
+        };
+
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const apresConflit = recalculApresConflit;
+            recalculApresConflit = false;
+            clearAlert();
+            planSection.classList.add('d-none');
+            emptyPlan.classList.add('d-none');
+            resultSection.classList.add('d-none');
+            jsonBox.textContent = '';
+            dernierPlan = null;
+            setBusy(planButton, planSpinner, planLabel, true, 'Calcul en cours…', 'Calculer le plan');
+
+            try {
+                const response = await fetch(planUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                    body: JSON.stringify({
+                        structure_id: Number(structureSelect.value),
+                        date_livraison: dateInput.value,
+                    }),
+                });
+                const { data, ok } = await lireReponse(response);
+                jsonBox.textContent = JSON.stringify(data, null, 2);
+
+                if (!ok) {
+                    showAlert('danger', escapeHtml(data.message ?? 'Le plan n’a pas pu être calculé.'));
+                    setStep(1);
+                    return;
+                }
+
+                planSubtitle.textContent = `${data.structure.nom} — ${numberFormat.format(data.paniers_total)} paniers répartis sur ${numberFormat.format(data.vehicules_total)} camionnette(s).`;
+                planDateBadge.textContent = formatDate(data.date_livraison);
+
+                if (!Array.isArray(data.vehicules) || data.vehicules.length === 0) {
+                    emptyPlan.classList.remove('d-none');
+                    setStep(1);
+                    if (apresConflit) {
+                        showAlert('warning', 'Un autre utilisateur a réservé les paniers entre-temps : il n’en reste plus à répartir.');
+                    }
+                    return;
+                }
+
+                dernierPlan = {};
+                if (Array.isArray(data.paniers_par_depot)) {
+                    data.paniers_par_depot.forEach((depot) => {
+                        dernierPlan[String(depot.depot_id)] = Number(depot.paniers ?? 0);
+                    });
+                }
+
+                renderKpis(data);
+                renderDepots(data.paniers_par_depot);
+                renderVehicles(data.vehicules);
+                planSection.classList.remove('d-none');
+                setStep(2);
+
+                if (apresConflit) {
+                    showAlert(
+                        'warning',
+                        'Un autre utilisateur a réservé des paniers entre-temps. Le plan a été recalculé automatiquement : vérifie les quantités, puis choisis à nouveau les chauffeurs.'
+                    );
+                }
+            } catch (error) {
+                showAlert('danger', 'Impossible de contacter le serveur. Vérifie qu’il est démarré.');
+                jsonBox.textContent = error instanceof Error ? error.message : String(error);
+            } finally {
+                enAttenteRecalcul = false;
+                setBusy(planButton, planSpinner, planLabel, false, 'Calcul en cours…', 'Calculer le plan');
+            }
+        });
+
+        creerButton.addEventListener('click', async () => {
+            if (enAttenteRecalcul) {
+                return;
+            }
+
+            const selects = Array.from(vehiclesRow.querySelectorAll('.driver-select'));
+            const affectations = {};
+            let complet = true;
+
+            selects.forEach((select) => {
+                if (select.value === '') {
+                    select.classList.add('is-missing');
+                    complet = false;
+                    return;
+                }
+                affectations[select.dataset.vehiculeId] = Number(select.value);
+            });
+
+            if (!complet) {
+                showAlert('warning', 'Sélectionne un chauffeur pour chaque camionnette avant de créer les tournées.');
+                return;
+            }
+
+            clearAlert();
+            resultSection.classList.add('d-none');
+            setBusy(creerButton, creerSpinner, creerLabel, true, 'Création en cours…', 'Créer les tournées');
+
+            try {
+                const response = await fetch(creerUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                    body: JSON.stringify({
+                        structure_id: Number(structureSelect.value),
+                        date_livraison: dateInput.value,
+                        chauffeurs_par_vehicule: affectations,
+                        plan_attendu: dernierPlan,
+                    }),
+                });
+                const { data, ok } = await lireReponse(response);
+                jsonBox.textContent = JSON.stringify(data, null, 2);
+
+                if (!ok) {
+                    if (data.code === 'plan_obsolete') {
+                        planSection.classList.add('d-none');
+                        setStep(1);
+                        showAlert('warning', `${escapeHtml(data.message)} Le plan va être recalculé automatiquement…`);
+                        enAttenteRecalcul = true;
+                        recalculApresConflit = true;
+                        setTimeout(() => form.requestSubmit(), 900);
+                        return;
+                    }
+
+                    showAlert('danger', escapeHtml(data.message ?? 'Les tournées n’ont pas pu être créées.'));
+                    return;
+                }
+
+                const nombre = Number(data.nombre_tournees ?? 0);
+                showAlert('success', `<strong>${nombre} tournée${nombre > 1 ? 's' : ''} créée${nombre > 1 ? 's' : ''}.</strong> Les paniers ont été affectés en base de données. <a href="${listeUrl}" class="alert-link">Voir les tournées organisées</a>.`);
+                renderResult(data.tournees);
+                setStep(4);
+            } catch (error) {
+                showAlert('danger', 'Impossible de contacter le serveur. Vérifie qu’il est démarré.');
+                jsonBox.textContent = error instanceof Error ? error.message : String(error);
+            } finally {
+                setBusy(creerButton, creerSpinner, creerLabel, false, 'Création en cours…', 'Créer les tournées');
+            }
+        });
+
+        const renderResult = (tournees) => {
+            if (!Array.isArray(tournees) || tournees.length === 0) {
+                return;
+            }
+
+            resultRow.innerHTML = tournees.map((tournee) => {
+                const capacite = Number(tournee.capacite_vehicule ?? 0);
+                const charge = Number(tournee.charge ?? 0);
+                const taux = capacite > 0 ? Math.min(100, Math.round((charge / capacite) * 100)) : 0;
+
+                const etapes = (tournee.etapes ?? []).map((etape) => `
+                    <div class="step-line">
+                        <span class="step-index">${etape.ordre}</span>
+                        <div class="flex-grow-1">
+                            <div class="fw-semibold small">${escapeHtml(etape.nom)}</div>
+                        </div>
+                        <span class="small text-muted">${numberFormat.format(etape.quantite ?? 0)} paniers</span>
+                    </div>
+                `).join('');
+
+                return `
+                    <div class="col-lg-6">
+                        <div class="result-card p-4">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div>
+                                    <div class="tc-label">Tournée</div>
+                                    <div class="h5 mb-1">#${tournee.tournee_id}</div>
+                                    <span class="badge text-bg-light">Livraison #${tournee.livraison_id}</span>
+                                </div>
+                                <span class="vehicle-plate">${escapeHtml(tournee.vehicule_immatriculation)}</span>
+                            </div>
+
+                            <div class="small mb-3">
+                                <div class="d-flex justify-content-between py-1">
+                                    <span class="text-muted">Chauffeur</span>
+                                    <span class="fw-semibold">${escapeHtml(tournee.chauffeur_nom ?? chauffeurLabel(tournee.chauffeur_id))}</span>
+                                </div>
+                                <div class="d-flex justify-content-between py-1">
+                                    <span class="text-muted">Date</span>
+                                    <span>${escapeHtml(formatDate(dateInput.value))}</span>
+                                </div>
+                            </div>
+
+                            <div class="d-flex justify-content-between small mb-1">
+                                <span class="text-muted">Charge</span>
+                                <span class="fw-semibold">${numberFormat.format(charge)} / ${numberFormat.format(capacite)} paniers</span>
+                            </div>
+                            <div class="progress progress-thin mb-3">
+                                <div class="progress-bar bg-success" style="width: ${taux}%"></div>
+                            </div>
+
+                            <div class="tc-label mb-1">Étapes</div>
+                            ${etapes}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            resultSection.classList.remove('d-none');
+        };
+
+        // ------------------------------------------------------------------
+        // Mode « demande ciblée »
+        // ------------------------------------------------------------------
+        const depotsParStructure = JSON.parse(document.getElementById('depots-par-structure').textContent || '{}');
+
+        const panelAuto = document.getElementById('panel-auto');
+        const panelCible = document.getElementById('panel-cible');
+        const modeAutoButton = document.getElementById('mode-auto');
+        const modeCibleButton = document.getElementById('mode-cible');
+
+        const cibleForm = document.getElementById('cible-form');
+        const cibleStructureSelect = document.getElementById('cible-structure-id');
+        const cibleDateInput = document.getElementById('cible-date-livraison');
+        const cibleLignes = document.getElementById('cible-lignes');
+        const cibleAucuneLigne = document.getElementById('cible-aucune-ligne');
+        const cibleResume = document.getElementById('cible-resume');
+        const ciblePlanButton = document.getElementById('btn-plan-cible');
+        const ciblePlanLabel = document.getElementById('plan-cible-label');
+        const ciblePlanSpinner = document.getElementById('plan-cible-spinner');
+        const ciblePlanSection = document.getElementById('cible-plan-section');
+        const ciblePlanSubtitle = document.getElementById('cible-plan-subtitle');
+        const ciblePlanDateBadge = document.getElementById('cible-plan-date-badge');
+        const cibleKpiRow = document.getElementById('cible-kpi-row');
+        const cibleLignesBody = document.getElementById('cible-lignes-body');
+        const cibleVehiclesRow = document.getElementById('cible-vehicles-row');
+        const cibleDriversCount = document.getElementById('cible-drivers-count');
+        const cibleCreerButton = document.getElementById('btn-creer-cible');
+        const cibleCreerLabel = document.getElementById('creer-cible-label');
+        const cibleCreerSpinner = document.getElementById('creer-cible-spinner');
+        const cibleResultSection = document.getElementById('cible-result-section');
+        const cibleResultRow = document.getElementById('cible-result-row');
+        const btnAddLigne = document.getElementById('btn-add-ligne');
+
+        let cibleDernierPlan = null;
+        let cibleRecalculApresConflit = false;
+        let cibleEnAttenteRecalcul = false;
+
+        const depotsDeLaStructure = () => depotsParStructure[String(cibleStructureSelect.value)] ?? [];
+
+        const renderLignes = () => {
+            const lignes = Array.from(cibleLignes.querySelectorAll('.cible-ligne'));
+            cibleAucuneLigne.classList.toggle('d-none', lignes.length > 0);
+            btnAddLigne.disabled = lignes.length === 0
+                ? false
+                : lignes.length >= depotsDeLaStructure().length || depotsDeLaStructure().length === 0;
+
+            const total = lignes.reduce((somme, ligne) => {
+                return somme + (Number(ligne.querySelector('.cible-quantite').value) || 0);
+            }, 0);
+
+            cibleResume.classList.toggle('d-none', lignes.length === 0);
+            if (lignes.length > 0) {
+                cibleResume.innerHTML = `<strong>${lignes.length}</strong> dépôt(s), <strong>${numberFormat.format(total)}</strong> panier(s) demandé(s).`;
+            }
+        };
+
+        const creerLigne = (depotId = '', quantite = '') => {
+            const depots = depotsDeLaStructure();
+            const dejaPris = new Set(
+                Array.from(cibleLignes.querySelectorAll('.cible-depot')).map((select) => select.value)
+            );
+
+            const ligne = document.createElement('div');
+            ligne.className = 'row g-2 align-items-end mb-2 cible-ligne';
+            ligne.innerHTML = `
+                <div class="col-md-7">
+                    <label class="form-label small mb-1">Dépôt</label>
+                    <select class="form-select cible-depot" required>
+                        <option value="">Choisir un dépôt…</option>
+                        ${depots.map((depot) => {
+                            const disabled = dejaPris.has(String(depot.id)) ? 'disabled' : '';
+                            return `<option value="${depot.id}" ${disabled}>${escapeHtml(depot.nom)} (${escapeHtml(depot.ville ?? '')}) — ${depot.stock} dispo</option>`;
+                        }).join('')}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small mb-1">Quantité</label>
+                    <input type="number" min="1" step="1" class="form-control cible-quantite" value="${quantite}" required>
+                </div>
+                <div class="col-md-2">
+                    <button type="button" class="btn btn-outline-danger w-100 btn-supprimer-ligne" aria-label="Retirer cette ligne">×</button>
+                </div>
+            `;
+
+            ligne.querySelector('.cible-depot').value = depotId === '' ? '' : String(depotId);
+            ligne.querySelector('.cible-depot').addEventListener('change', renderLignes);
+            ligne.querySelector('.cible-quantite').addEventListener('input', renderLignes);
+            ligne.querySelector('.btn-supprimer-ligne').addEventListener('click', () => {
+                ligne.remove();
+                renderLignes();
+            });
+
+            cibleLignes.appendChild(ligne);
+            renderLignes();
+            return ligne;
+        };
+
+        const lireLignesCible = () => Array.from(cibleLignes.querySelectorAll('.cible-ligne')).map((ligne) => ({
+            depot_id: Number(ligne.querySelector('.cible-depot').value),
+            quantite: Number(ligne.querySelector('.cible-quantite').value),
+        }));
+
+        const renderCibleKpis = (data) => {
+            const cards = [
+                { label: 'Paniers demandés', value: numberFormat.format(data.paniers_total), sub: `${data.lignes.length} dépôt(s) concerné(s)` },
+                { label: 'Camionnettes utilisées', value: numberFormat.format(data.vehicules.length), sub: `${numberFormat.format(data.vehicules.reduce((s, v) => s + v.capacite, 0))} paniers de capacité` },
+                { label: 'Chargement total', value: numberFormat.format(data.vehicules.reduce((s, v) => s + v.charge, 0)), sub: 'paniers réservés' },
+            ];
+
+            cibleKpiRow.innerHTML = cards.map((card) => `
+                <div class="col-md-4">
+                    <div class="kpi">
+                        <div class="tc-label mb-2">${escapeHtml(card.label)}</div>
+                        <div class="kpi-value">${escapeHtml(card.value)}</div>
+                        <div class="kpi-sub">${escapeHtml(card.sub)}</div>
+                    </div>
+                </div>
+            `).join('');
+        };
+
+        const renderCibleVehicles = (vehicules) => {
+            cibleVehiclesRow.innerHTML = vehicules.map((vehicule) => {
+                const etapes = vehicule.etapes.map((etape) => `
+                    <div class="step-line">
+                        <span class="step-index">${etape.ordre}</span>
+                        <div class="flex-grow-1">
+                            <div class="fw-semibold small">${escapeHtml(etape.nom)}</div>
+                            <div class="text-muted small">${escapeHtml(etape.ville ?? '')}</div>
+                        </div>
+                        <span class="badge badge-soft align-self-center">${numberFormat.format(etape.quantite)} paniers</span>
+                    </div>
+                `).join('');
+
+                return `
+                    <div class="col-xl-6">
+                        <div class="vehicle-card p-4">
+                            <div class="d-flex justify-content-between align-items-start gap-3 mb-3">
+                                <div>
+                                    <span class="vehicle-plate">${escapeHtml(vehicule.immatriculation)}</span>
+                                    <div class="text-muted small mt-2">${escapeHtml(vehicule.modele ?? 'Modèle non renseigné')}</div>
+                                </div>
+                                <span class="badge text-bg-light">${numberFormat.format(vehicule.reste)} libre(s)</span>
+                            </div>
+                            <div class="d-flex justify-content-between small mb-1">
+                                <span class="text-muted">Chargement</span>
+                                <span class="fw-semibold">${numberFormat.format(vehicule.charge)} / ${numberFormat.format(vehicule.capacite)} paniers</span>
+                            </div>
+                            <div class="progress progress-thin mb-4">
+                                <div class="progress-bar bg-success" style="width: ${Math.min(100, vehicule.taux)}%"></div>
+                            </div>
+                            <div class="tc-label mb-2">Chauffeur</div>
+                            <select class="form-select cible-driver-select mb-3" data-vehicule-id="${vehicule.vehicule_id}">
+                                <option value="">Choisir un chauffeur…</option>
+                                ${chauffeurs.map((chauffeur) => `
+                                    <option value="${chauffeur.id}">${escapeHtml(chauffeur.nom)}${chauffeur.permis ? ` — permis ${escapeHtml(chauffeur.permis)}` : ''}</option>
+                                `).join('')}
+                            </select>
+                            <div class="tc-label mb-1">Itinéraire (${vehicule.etapes.length} étape${vehicule.etapes.length > 1 ? 's' : ''})</div>
+                            ${etapes}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            cibleVehiclesRow.querySelectorAll('.cible-driver-select').forEach((select) => {
+                select.addEventListener('change', () => {
+                    rafraichirChoixChauffeursCible();
+                    select.classList.remove('is-missing');
+                });
+            });
+
+            rafraichirChoixChauffeursCible();
+        };
+
+        const rafraichirChoixChauffeursCible = () => {
+            const selects = Array.from(cibleVehiclesRow.querySelectorAll('.cible-driver-select'));
+            const selectionnes = new Set(selects.map((s) => s.value).filter((v) => v !== ''));
+
+            selects.forEach((select) => {
+                Array.from(select.options).forEach((option) => {
+                    if (option.value === '') {
+                        return;
+                    }
+                    option.disabled = option.value !== select.value && selectionnes.has(option.value);
+                });
+            });
+
+            const remplis = selects.filter((s) => s.value !== '').length;
+            cibleDriversCount.textContent = `${remplis} / ${selects.length} chauffeur${selects.length > 1 ? 's' : ''} affecté${remplis > 1 ? 's' : ''}`;
+            cibleCreerButton.disabled = remplis !== selects.length || selects.length === 0;
+        };
+
+        const renderCibleResult = (tournees) => {
+            cibleResultRow.innerHTML = (tournees ?? []).map((tournee) => {
+                const capacite = Number(tournee.capacite_vehicule ?? 0);
+                const charge = Number(tournee.charge ?? 0);
+                const taux = capacite > 0 ? Math.min(100, Math.round((charge / capacite) * 100)) : 0;
+                const etapes = (tournee.etapes ?? []).map((etape) => `
+                    <div class="step-line">
+                        <span class="step-index">${etape.ordre}</span>
+                        <div class="flex-grow-1"><div class="fw-semibold small">${escapeHtml(etape.nom)}</div></div>
+                        <span class="small text-muted">${numberFormat.format(etape.quantite ?? 0)} paniers</span>
+                    </div>
+                `).join('');
+
+                return `
+                    <div class="col-lg-6">
+                        <div class="result-card p-4">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div>
+                                    <div class="tc-label">Tournée</div>
+                                    <div class="h5 mb-1">#${tournee.tournee_id}</div>
+                                    <span class="badge text-bg-light">Livraison #${tournee.livraison_id}</span>
+                                </div>
+                                <span class="vehicle-plate">${escapeHtml(tournee.vehicule_immatriculation)}</span>
+                            </div>
+                            <div class="small mb-3">
+                                <div class="d-flex justify-content-between py-1">
+                                    <span class="text-muted">Chauffeur</span>
+                                    <span class="fw-semibold">${escapeHtml(tournee.chauffeur_nom ?? chauffeurLabel(tournee.chauffeur_id))}</span>
+                                </div>
+                            </div>
+                            <div class="d-flex justify-content-between small mb-1">
+                                <span class="text-muted">Charge</span>
+                                <span class="fw-semibold">${numberFormat.format(charge)} / ${numberFormat.format(capacite)} paniers</span>
+                            </div>
+                            <div class="progress progress-thin mb-3">
+                                <div class="progress-bar bg-success" style="width: ${taux}%"></div>
+                            </div>
+                            <div class="tc-label mb-1">Étapes</div>
+                            ${etapes}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            cibleResultSection.classList.remove('d-none');
+        };
+
+        btnAddLigne.addEventListener('click', () => creerLigne());
+
+        cibleStructureSelect.addEventListener('change', () => {
+            cibleLignes.innerHTML = '';
+            ciblePlanSection.classList.add('d-none');
+            cibleResultSection.classList.add('d-none');
+            cibleDernierPlan = null;
+            renderLignes();
+            clearAlert();
+        });
+
+        cibleForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const apresConflit = cibleRecalculApresConflit;
+            cibleRecalculApresConflit = false;
+            clearAlert();
+            ciblePlanSection.classList.add('d-none');
+            cibleResultSection.classList.add('d-none');
+            jsonBox.textContent = '';
+
+            const lignes = lireLignesCible();
+            if (lignes.length === 0) {
+                showAlert('warning', 'Ajoute au moins un dépôt à la demande.');
+                return;
+            }
+
+            setBusy(ciblePlanButton, ciblePlanSpinner, ciblePlanLabel, true, 'Vérification…', 'Vérifier la demande');
+
+            try {
+                const response = await fetch(planCibleUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                    body: JSON.stringify({
+                        structure_id: Number(cibleStructureSelect.value),
+                        date_livraison: cibleDateInput.value,
+                        lignes,
+                    }),
+                });
+                const { data, ok } = await lireReponse(response);
+                jsonBox.textContent = JSON.stringify(data, null, 2);
+
+                if (!ok) {
+                    showAlert('danger', escapeHtml(data.message ?? 'La demande n’a pas pu être vérifiée.'));
+                    return;
+                }
+
+                ciblePlanSubtitle.textContent = `${data.structure.nom} — ${numberFormat.format(data.paniers_total)} paniers sur ${data.vehicules.length} camionnette(s).`;
+                ciblePlanDateBadge.textContent = formatDate(data.date_livraison);
+
+                cibleLignesBody.innerHTML = data.lignes.map((ligne) => `
+                    <tr>
+                        <td class="fw-semibold">${escapeHtml(ligne.nom)}</td>
+                        <td class="text-muted small">${escapeHtml(ligne.ville ?? '—')}</td>
+                        <td class="text-end fw-semibold">${numberFormat.format(ligne.quantite)}</td>
+                        <td class="text-end">${numberFormat.format(ligne.stock_disponible ?? 0)}</td>
+                        <td class="text-end text-muted">${ligne.capacite_max === null ? '—' : numberFormat.format(ligne.capacite_max)}</td>
+                    </tr>
+                `).join('');
+
+                cibleDernierPlan = data.plan_attendu;
+                renderCibleKpis(data);
+                renderCibleVehicles(data.vehicules);
+                ciblePlanSection.classList.remove('d-none');
+
+                if (apresConflit) {
+                    showAlert('warning', 'Un autre utilisateur a réservé des paniers entre-temps. Le plan a été recalculé automatiquement : vérifie les quantités, puis choisis à nouveau les chauffeurs.');
+                }
+            } catch (error) {
+                showAlert('danger', 'Impossible de contacter le serveur. Vérifie qu’il est démarré.');
+                jsonBox.textContent = error instanceof Error ? error.message : String(error);
+            } finally {
+                cibleEnAttenteRecalcul = false;
+                setBusy(ciblePlanButton, ciblePlanSpinner, ciblePlanLabel, false, 'Vérification…', 'Vérifier la demande');
+            }
+        });
+
+        cibleCreerButton.addEventListener('click', async () => {
+            if (cibleEnAttenteRecalcul) {
+                return;
+            }
+
+            const selects = Array.from(cibleVehiclesRow.querySelectorAll('.cible-driver-select'));
+            const affectations = {};
+            let complet = true;
+
+            selects.forEach((select) => {
+                if (select.value === '') {
+                    select.classList.add('is-missing');
+                    complet = false;
+                    return;
+                }
+                affectations[select.dataset.vehiculeId] = Number(select.value);
+            });
+
+            if (!complet) {
+                showAlert('warning', 'Sélectionne un chauffeur pour chaque camionnette avant de créer la tournée.');
+                return;
+            }
+
+            clearAlert();
+            cibleResultSection.classList.add('d-none');
+            setBusy(cibleCreerButton, cibleCreerSpinner, cibleCreerLabel, true, 'Création en cours…', 'Créer la tournée ciblée');
+
+            try {
+                const response = await fetch(creerCibleUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                    body: JSON.stringify({
+                        structure_id: Number(cibleStructureSelect.value),
+                        date_livraison: cibleDateInput.value,
+                        lignes: lireLignesCible(),
+                        chauffeurs_par_vehicule: affectations,
+                        plan_attendu: cibleDernierPlan,
+                    }),
+                });
+                const { data, ok } = await lireReponse(response);
+                jsonBox.textContent = JSON.stringify(data, null, 2);
+
+                if (!ok) {
+                    if (data.code === 'plan_obsolete') {
+                        ciblePlanSection.classList.add('d-none');
+                        showAlert('warning', `${escapeHtml(data.message)} Le plan va être recalculé automatiquement…`);
+                        cibleEnAttenteRecalcul = true;
+                        cibleRecalculApresConflit = true;
+                        setTimeout(() => cibleForm.requestSubmit(), 900);
+                        return;
+                    }
+
+                    showAlert('danger', escapeHtml(data.message ?? 'La tournée n’a pas pu être créée.'));
+                    return;
+                }
+
+                const nombre = Number(data.nombre_tournees ?? 0);
+                showAlert('success', `<strong>${nombre} tournée${nombre > 1 ? 's' : ''} créée${nombre > 1 ? 's' : ''}.</strong> Les paniers ciblés ont été affectés en base de données. <a href="${listeUrl}" class="alert-link">Voir les tournées organisées</a>.`);
+                renderCibleResult(data.tournees);
+            } catch (error) {
+                showAlert('danger', 'Impossible de contacter le serveur. Vérifie qu’il est démarré.');
+                jsonBox.textContent = error instanceof Error ? error.message : String(error);
+            } finally {
+                setBusy(cibleCreerButton, cibleCreerSpinner, cibleCreerLabel, false, 'Création en cours…', 'Créer la tournée ciblée');
+            }
+        });
+
+        const basculerMode = (cible) => {
+            panelAuto.classList.toggle('d-none', cible);
+            panelCible.classList.toggle('d-none', !cible);
+            modeAutoButton.classList.toggle('active', !cible);
+            modeCibleButton.classList.toggle('active', cible);
+            clearAlert();
+            jsonBox.textContent = '';
+        };
+
+        modeAutoButton.addEventListener('click', () => basculerMode(false));
+        modeCibleButton.addEventListener('click', () => basculerMode(true));
+
+        if (depotsDeLaStructure().length > 0) {
+            creerLigne();
+        }
+        renderLignes();
+    </script>
+{% endblock %}
