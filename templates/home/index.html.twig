@@ -2,11 +2,6 @@
 
 {% block title %}Accueil - Les Jardins de Cocagne{% endblock %}
 
-{% block stylesheets %}
-    {{ parent() }}
-    <link rel="stylesheet" href="{{ asset('css/accueil.css') }}">
-{% endblock %}
-
 {% block body %}
     {# --- Bloc principal de présentation (format réduit) --- #}
     <div class="description">
@@ -16,7 +11,7 @@
         </div>
 
         <div class="image-wrapper">
-            <img src="{{ asset('images/accueil.png') }}" alt="Jardins de Cocagne">
+            <img src="{{ asset('images/accueil.PNG') }}" alt="Jardins de Cocagne">
         </div>
     </div>
 

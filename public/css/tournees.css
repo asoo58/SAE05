@@ -1,0 +1,751 @@
+/* Styles specifiques au module tournees. */
+
+/* --- organisation --- */
+:root {
+    --tc-green: #00664f;
+    --tc-green-dark: #004d3c;
+    --tc-green-light: #e8f5ec;
+    --tc-orange: #cc7826;
+    --tc-violet: #4f46e5;
+}
+
+.tournees-page {
+    padding-bottom: 3rem;
+}
+
+.tournees-hero {
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(135deg, var(--tc-green) 0%, #0f8a63 100%);
+    color: #fff;
+}
+
+.tournees-hero::after,
+.tournees-hero::before {
+    content: '';
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, .09);
+    pointer-events: none;
+}
+
+.tournees-hero::after {
+    width: 280px;
+    height: 280px;
+    right: -90px;
+    top: -110px;
+}
+
+.tournees-hero::before {
+    width: 180px;
+    height: 180px;
+    right: 130px;
+    bottom: -120px;
+}
+
+.hero-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 62px;
+    width: 62px;
+    height: 62px;
+    border-radius: 20px;
+    color: #fff;
+    background: rgba(255, 255, 255, .16);
+    backdrop-filter: blur(4px);
+}
+
+.tournees-stepper {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    counter-reset: tc-step;
+}
+
+.tournees-stepper li {
+    counter-increment: tc-step;
+    flex: 1 1 150px;
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    padding: .75rem .9rem;
+    border-radius: 14px;
+    background: #fff;
+    border: 1px solid #e6ece8;
+    color: #5a6a62;
+    font-size: .85rem;
+    font-weight: 600;
+}
+
+.tournees-stepper li::before {
+    content: counter(tc-step);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 26px;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: #eef3f0;
+    color: #60736a;
+    font-size: .8rem;
+    font-weight: 700;
+}
+
+.tournees-stepper li.is-active {
+    border-color: #8fcf9f;
+    background: var(--tc-green-light);
+    color: var(--tc-green);
+}
+
+.tournees-stepper li.is-active::before {
+    background: var(--tc-green);
+    color: #fff;
+}
+
+.tc-card {
+    border: 0;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(20, 45, 35, .08);
+}
+
+.tc-label {
+    font-size: .78rem;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    font-weight: 700;
+    color: #78877f;
+}
+
+.kpi {
+    height: 100%;
+    padding: 1.1rem 1.2rem;
+    border-radius: 18px;
+    background: #fff;
+    border: 1px solid #e6ece8;
+}
+
+.kpi-value {
+    font-size: 1.7rem;
+    font-weight: 800;
+    line-height: 1.1;
+    color: var(--tc-green);
+}
+
+.kpi-sub {
+    font-size: .78rem;
+    color: #7b8a82;
+}
+
+.vehicle-card {
+    border: 1px solid #e6ece8;
+    border-radius: 18px;
+    background: #fff;
+    height: 100%;
+}
+
+.vehicle-plate {
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    padding: .3rem .65rem;
+    border-radius: 8px;
+    background: #12221c;
+    color: #fff;
+    font-weight: 700;
+    letter-spacing: .05em;
+    font-size: .86rem;
+}
+
+.tournees-page--organisation .step-line {
+    display: flex;
+    gap: .75rem;
+    padding: .55rem 0;
+    border-bottom: 1px dashed #e6ece8;
+}
+
+.step-line:last-child {
+    border-bottom: 0;
+}
+
+.step-index {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 26px;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: #eef4ff;
+    color: #3557b7;
+    font-size: .8rem;
+    font-weight: 700;
+}
+
+.progress-thin {
+    height: 8px;
+    border-radius: 999px;
+    background: #eef3f0;
+}
+
+.progress-thin .progress-bar {
+    border-radius: 999px;
+}
+
+.driver-select.is-missing {
+    border-color: #dc3545;
+    box-shadow: 0 0 0 .2rem rgba(220, 53, 69, .15);
+}
+
+.tournees-page--organisation .empty-illustration {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+    border-radius: 18px;
+    background: var(--tc-green-light);
+    color: var(--tc-green);
+}
+
+.result-card {
+    border: 0;
+    border-radius: 18px;
+    box-shadow: 0 8px 24px rgba(20, 45, 35, .08);
+    height: 100%;
+}
+
+.badge-soft {
+    background: var(--tc-green-light);
+    color: var(--tc-green);
+    font-weight: 600;
+}
+
+.table-depots thead th {
+    font-size: .76rem;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    color: #78877f;
+    border-bottom-color: #e6ece8;
+}
+
+.table-depots td {
+    vertical-align: middle;
+}
+
+.btn-tc {
+    --bs-btn-color: #fff;
+    --bs-btn-hover-color: #fff;
+    --bs-btn-active-color: #fff;
+    --bs-btn-disabled-color: #fff;
+    --bs-btn-bg: var(--tc-green);
+    --bs-btn-border-color: var(--tc-green);
+    --bs-btn-hover-bg: var(--tc-green-dark);
+    --bs-btn-hover-border-color: var(--tc-green-dark);
+    --bs-btn-active-bg: #00382b;
+    --bs-btn-active-border-color: #00382b;
+    --bs-btn-disabled-bg: var(--tc-green);
+    --bs-btn-disabled-border-color: var(--tc-green);
+    font-weight: 600;
+}
+
+.btn-tc-outline {
+    --bs-btn-color: var(--tc-green);
+    --bs-btn-border-color: #b9d6c6;
+    --bs-btn-hover-bg: var(--tc-green-light);
+    --bs-btn-hover-border-color: #8fcf9f;
+    --bs-btn-hover-color: var(--tc-green-dark);
+    font-weight: 600;
+}
+
+.section-title {
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #1c2a24;
+}
+
+.section-title .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--tc-green);
+}
+
+.fade-in {
+    animation: tcFade .25s ease-in-out;
+}
+
+@keyframes tcFade {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- liste --- */
+.tournees-page {
+    padding-bottom: 3rem;
+}
+
+.tournees-hero {
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(135deg, var(--tc-green) 0%, #0f8a63 100%);
+    color: #fff;
+}
+
+.tournees-hero::after,
+.tournees-hero::before {
+    content: '';
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, .09);
+    pointer-events: none;
+}
+
+.tournees-hero::after {
+    width: 280px;
+    height: 280px;
+    right: -90px;
+    top: -110px;
+}
+
+.tournees-hero::before {
+    width: 180px;
+    height: 180px;
+    right: 130px;
+    bottom: -120px;
+}
+
+.hero-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 62px;
+    width: 62px;
+    height: 62px;
+    border-radius: 20px;
+    color: #fff;
+    background: rgba(255, 255, 255, .16);
+    backdrop-filter: blur(4px);
+}
+
+.tc-card {
+    border: 0;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(20, 45, 35, .08);
+}
+
+.kpi {
+    height: 100%;
+    padding: 1.1rem 1.2rem;
+    border-radius: 18px;
+    background: #fff;
+    border: 1px solid #e6ece8;
+}
+
+.kpi-value {
+    font-size: 1.7rem;
+    font-weight: 800;
+    line-height: 1.1;
+    color: var(--tc-green);
+}
+
+.kpi-sub {
+    font-size: .78rem;
+    color: #7b8a82;
+}
+
+.tc-label {
+    font-size: .78rem;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    font-weight: 700;
+    color: #78877f;
+}
+
+.vehicle-plate {
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    padding: .3rem .65rem;
+    border-radius: 8px;
+    background: #12221c;
+    color: #fff;
+    font-weight: 700;
+    letter-spacing: .05em;
+    font-size: .86rem;
+}
+
+.tournee-card {
+    border: 1px solid #e6ece8;
+    border-radius: 18px;
+    background: #fff;
+    height: 100%;
+}
+
+.step-line {
+    display: flex;
+    gap: .75rem;
+    padding: .5rem 0;
+    border-bottom: 1px dashed #e6ece8;
+}
+
+.step-line:last-child {
+    border-bottom: 0;
+}
+
+.step-index {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 26px;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: #eef4ff;
+    color: #3557b7;
+    font-size: .8rem;
+    font-weight: 700;
+}
+
+.progress-thin {
+    height: 8px;
+    border-radius: 999px;
+    background: #eef3f0;
+}
+
+.progress-thin .progress-bar {
+    border-radius: 999px;
+}
+
+.btn-tc-outline {
+    --bs-btn-color: var(--tc-green);
+    --bs-btn-border-color: #b9d6c6;
+    --bs-btn-hover-bg: var(--tc-green-light);
+    --bs-btn-hover-border-color: #8fcf9f;
+    --bs-btn-hover-color: var(--tc-green-dark);
+    font-weight: 600;
+}
+
+.section-title {
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #1c2a24;
+}
+
+.section-title .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--tc-green);
+}
+
+.date-separator {
+    display: flex;
+    align-items: center;
+    gap: .8rem;
+    margin: 1.8rem 0 1rem;
+}
+
+.date-separator::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: #dfe8e3;
+}
+
+.date-separator .badge {
+    background: var(--tc-green-light);
+    color: var(--tc-green);
+}
+
+.empty-illustration {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 64px;
+    height: 64px;
+    border-radius: 20px;
+    background: var(--tc-green-light);
+    color: var(--tc-green);
+}
+
+.badge-soft {
+    background: var(--tc-green-light);
+    color: var(--tc-green);
+    font-weight: 600;
+}
+
+/* --- itineraire --- */
+.tournees-page {
+    padding-bottom: 3rem;
+}
+
+.tournees-hero {
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(135deg, var(--tc-green) 0%, #0f8a63 100%);
+    color: #fff;
+}
+
+.tournees-hero::after,
+.tournees-hero::before {
+    content: '';
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, .09);
+    pointer-events: none;
+}
+
+.tournees-hero::after {
+    width: 280px;
+    height: 280px;
+    right: -90px;
+    top: -110px;
+}
+
+.tournees-hero::before {
+    width: 180px;
+    height: 180px;
+    right: 130px;
+    bottom: -120px;
+}
+
+.hero-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 62px;
+    width: 62px;
+    height: 62px;
+    border-radius: 20px;
+    color: #fff;
+    background: rgba(255, 255, 255, .16);
+    backdrop-filter: blur(4px);
+}
+
+.tc-card {
+    border: 0;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(20, 45, 35, .08);
+}
+
+.tc-label {
+    font-size: .78rem;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    font-weight: 700;
+    color: #78877f;
+}
+
+.btn-tc-outline {
+    --bs-btn-color: var(--tc-green);
+    --bs-btn-border-color: #b9d6c6;
+    --bs-btn-hover-bg: var(--tc-green-light);
+    --bs-btn-hover-border-color: #8fcf9f;
+    --bs-btn-hover-color: var(--tc-green-dark);
+    font-weight: 600;
+}
+
+.itineraire-card {
+    border: 1px solid #e6ece8;
+    border-left: 6px solid var(--tc-green);
+    border-radius: 18px;
+    background: #fff;
+}
+
+.tournee-dot {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+}
+
+.chip {
+    display: inline-flex;
+    align-items: center;
+    gap: .3rem;
+    padding: .28rem .6rem;
+    border-radius: 999px;
+    background: #f2f7f4;
+    color: #4c5d55;
+    font-size: .78rem;
+    font-weight: 600;
+}
+
+.step-row {
+    display: flex;
+    align-items: flex-start;
+    gap: .8rem;
+    padding: .7rem .9rem;
+    margin-bottom: .5rem;
+    border: 1px solid #e6ece8;
+    border-radius: 14px;
+    background: #fbfdfc;
+}
+
+.tournees-page--itineraire .step-index {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 32px;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--tc-green-light);
+    color: var(--tc-green-dark);
+    font-weight: 800;
+    font-size: .86rem;
+}
+
+.step-meta {
+    font-size: .8rem;
+    color: #7b8a82;
+}
+
+.step-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .4rem;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.btn-move {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border-radius: 9px;
+    border: 1px solid #d7e2db;
+    background: #fff;
+    color: #4c5d55;
+}
+
+.btn-move:hover:not(:disabled) {
+    background: var(--tc-green-light);
+    border-color: #9ec9b0;
+    color: var(--tc-green-dark);
+}
+
+.btn-move:disabled {
+    opacity: .35;
+    cursor: not-allowed;
+}
+
+.btn-move.is-danger:hover {
+    background: #fdecec;
+    border-color: #e7a3a3;
+    color: #a32222;
+}
+
+.add-step {
+    border-top: 1px dashed #dfe8e3;
+}
+
+.transfer-form {
+    display: inline-flex;
+    gap: .35rem;
+    align-items: center;
+}
+
+.transfer-form .form-select-sm {
+    max-width: 190px;
+}
+
+.empty-illustration {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 64px;
+    height: 64px;
+    border-radius: 20px;
+    background: var(--tc-green-light);
+    color: var(--tc-green);
+}
+
+.settings-toggle {
+    font-size: .82rem;
+    font-weight: 600;
+    color: var(--tc-green);
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.settings-toggle:hover {
+    text-decoration: underline;
+}
+
+.settings-details summary {
+    list-style: none;
+}
+
+.settings-details summary::-webkit-details-marker {
+    display: none;
+}
+
+.settings-details summary::before {
+    content: 'â–¸ ';
+}
+
+.settings-details[open] summary::before {
+    content: 'â–¾ ';
+}
+
+@media (max-width: 767.98px) {
+    .step-row {
+        flex-wrap: wrap;
+    }
+
+    .step-actions {
+        width: 100%;
+        justify-content: flex-start;
+    }
+}
+
+/* --- onglets partages --- */
+.tournees-nav {
+display: inline-flex;
+flex-wrap: wrap;
+gap: .35rem;
+padding: .3rem;
+border-radius: 14px;
+background: #fff;
+border: 1px solid #e6ece8;
+box-shadow: 0 4px 14px rgba(20, 45, 35, .05);
+    }
+
+    .tournees-nav a {
+display: inline-flex;
+align-items: center;
+gap: .45rem;
+padding: .55rem 1rem;
+border-radius: 10px;
+color: #5a6a62;
+font-weight: 600;
+font-size: .9rem;
+text-decoration: none;
+transition: background-color .15s ease, color .15s ease;
+    }
+
+    .tournees-nav a:hover {
+background: #f2f7f4;
+color: #00664f;
+    }
+
+    .tournees-nav a.is-active {
+background: #00664f;
+color: #fff;
+    }
+

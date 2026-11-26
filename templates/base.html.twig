@@ -4,13 +4,7 @@
     <meta charset="UTF-8">
     <title>{% block title %}Jardin de cocagne{% endblock %}</title>
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/admin.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/utilisateur.css') }}">
-    <link rel="icon" href="{{ asset('images/logo-1.svg') }}">
-
-    {# En local #}
-    <link rel="stylesheet" href="{{ asset('css/bootstrap.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/tabler.min.css') }}">
+    <link rel="icon" href="{{ asset('images/Jardins_Thaon - Simple.svg') }}">
 
     {% block stylesheets %}{% endblock %}
 </head>
@@ -35,7 +29,7 @@
     {# --- Navigation principale --- #}
     <nav class="navigation-principale">
         <a href="{{ path('app_home') }}" class="nav-lien actif">Accueil</a>
-        <a href="#depots" class="nav-lien">Dépôts & Tournées</a>
+        <a href="{{ path('app_tournees') }}" class="nav-lien">Dépôts & Tournées</a>
         <a href="#recettes" class="nav-lien">Recettes</a>
         <a href="#contact" class="nav-lien">Contact</a>
     </nav>
